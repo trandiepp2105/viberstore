@@ -1,0 +1,55 @@
+.alert-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  //   background-color: rgba(0, 0, 0, 0.5); /* Đen với độ trong suốt 50% */
+  background-color: #fff;
+  color: #000;
+
+  width: 230px;
+  height: 130px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  //   padding: 20px 0;
+
+  .alert-popup__title {
+    // margin: 0 15px;
+    margin-top: 15px;
+
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .alert-popup__message {
+    margin: 0 15px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .wrapper-close-button {
+    width: 100%;
+    // height: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-top: 1px solid #000;
+    .close-popup-button {
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      color: #0fbcf6;
+      padding: 5px 0;
+    }
+  }
+}

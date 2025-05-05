@@ -1,0 +1,196 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+
+.productContainer {
+  width: 100%;
+  aspect-ratio: 250 / 430 !important;
+  // height: 100%;
+  // height: fit-content;
+  // padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  // height: 100%;
+  position: relative;
+  // aspect-ratio: 475 / 630 !important;
+
+  background-color: white;
+  box-sizing: border-box;
+  // border-radius: 15px;
+  // box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.1),
+  //   0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  .productInfor {
+    flex-grow: 1;
+
+    .productLink {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      .productImage {
+        text-align: center;
+        flex-grow: 1;
+        .productImg {
+          width: 100%;
+        }
+      }
+      .productName {
+        // -webkit-line-clamp: 3;
+        color: #444;
+        font-size: 1em;
+        margin-bottom: 5px;
+        height: calc(18px);
+        text-align: left;
+        width: 100%;
+        padding-right: 5px;
+        h3 {
+          width: 100%;
+          font-size: 16px;
+          line-height: 18px;
+          font-weight: 500;
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          font-family: "Quicksand", sans-serif !important;
+
+          // white-space: rap !important;
+        }
+      }
+      .boxPrice {
+        width: 100%;
+        display: flex;
+        font-family: sans-serif;
+        align-items: center;
+        .priceShow {
+          color: #d70018;
+          font-weight: 500;
+          line-height: 1.1;
+          font-size: 16px;
+          margin-right: 10px;
+        }
+
+        .priceThrough {
+          font-size: 14px;
+          color: #707070;
+          font-weight: 400;
+          text-decoration: line-through;
+        }
+
+        .pricePercent {
+          background-image: url("../../../public/assets/images/price-percent-bg.png");
+          background-size: cover;
+          width: 80px;
+          height: 31px;
+          position: absolute;
+          top: -2px;
+          left: -5px;
+          z-index: 100;
+          .pricePercentDetail {
+            color: #fff;
+            font-size: 10px;
+            font-weight: 500;
+            margin: 5px 0 0;
+            text-align: center;
+            width: 100%;
+          }
+        }
+      }
+      .blockBoxMemPrice {
+        display: flex;
+        font-size: 11px;
+        margin-bottom: 5px;
+        flex-wrap: wrap;
+        align-items: baseline;
+        .memPromotion {
+          color: #d70018;
+          font-size: 10px;
+          font-weight: 500;
+          margin-left: 5px;
+        }
+      }
+
+      .productPromotions {
+        margin-bottom: 10px;
+        .promotion {
+          align-items: flex-start;
+          background: #f3f4f6;
+          border: 1px solid #e5e7eb;
+          border-radius: 5px;
+          display: flex;
+          font-size: 10px;
+          line-height: 1.5;
+          margin-left: 0;
+          overflow: hidden;
+          padding: 5px;
+          text-transform: none;
+          width: auto;
+          white-space: wrap !important;
+        }
+      }
+    }
+  }
+
+  .productRating {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    .boxRating {
+      display: flex;
+      align-items: center;
+      padding-bottom: 3px;
+      .wapperIconStar {
+        height: 15px;
+        width: 15px;
+        margin-right: 2px;
+        .iconStar {
+          height: 100%;
+          width: 100%;
+          object-fit: cover;
+          filter: brightness(0) saturate(100%) invert(69%) sepia(12%)
+            saturate(4338%) hue-rotate(354deg) brightness(97%) contrast(98%);
+        }
+      }
+    }
+
+    .boxWishList {
+      // margin-top: 5px;
+      padding-top: 3px;
+      display: flex;
+      align-items: center;
+      color: #777;
+      font-size: 12px;
+      align-items: center;
+      .wishListBtn {
+        cursor: pointer;
+        align-items: center;
+        display: flex;
+        height: 20px;
+        justify-content: center;
+        padding: 0;
+        width: 16px;
+        filter: invert(37%) sepia(93%) saturate(7471%) hue-rotate(356deg)
+          brightness(91%) contrast(135%);
+
+        .iconHeart {
+          animation: bounceIn 1s linear;
+          transition: opacity 1s ease-out;
+        }
+      }
+    }
+  }
+
+  .installZeroPercentTag {
+    background: #fff;
+    border: 1px solid #0c53b7;
+    border-radius: 5px;
+    color: #0c53b7;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 5px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+}

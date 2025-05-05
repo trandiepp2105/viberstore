@@ -1,0 +1,27 @@
+:root {
+  --banner-bg-color: #eaefff;
+}
+
+.bannerTop {
+  width: 100%;
+  padding: 5px;
+  background-color: var(--banner-bg-color);
+}
+
+.bannerTopContent {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  height: 30px;
+}
+
+.bannerSlice {
+  width: 31%;
+  height: 100%;
+  margin-right: 10px;
+}
+
+.bannerTopImg {
+  width: 100%;
+  height: 100%;
+}

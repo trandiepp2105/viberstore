@@ -1,0 +1,19 @@
+django==5.1.3
+mysqlclient
+djangorestframework
+django-cors-headers
+djangorestframework-simplejwt
+drf-yasg
+pyjwt
+django-allauth
+django-redis
+pyotp
+Pillow
+pillow-avif-plugin 
+pillow-heif
+pyheif
+requests
+elasticsearch-dsl >= 8.0.0
+pandas
+celery
+django-celery-beat

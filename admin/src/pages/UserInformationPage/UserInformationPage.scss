@@ -1,0 +1,183 @@
+@import "../../styles/variables";
+
+.category-detail-page {
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+  display: flex;
+
+  .page-content {
+    flex-grow: 1;
+    // display: flex;
+    // flex-direction: column;
+    .header {
+      height: $header-height;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 25px;
+      padding-left: 25px;
+
+      .left-side {
+        .title {
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          .back-link {
+            font-size: 30px;
+            color: #000;
+            text-decoration: none;
+            font-weight: 600;
+          }
+          span {
+            display: flex;
+            align-items: end;
+            margin-left: 5px;
+          }
+
+          .user-name {
+            margin-left: 5px;
+            font-size: 14px;
+          }
+        }
+      }
+
+      .right-side {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-right: 10px;
+        .delete-btn {
+          padding: 8px 15px;
+          font-size: 16px;
+          border-radius: 5px;
+          border: none;
+          outline: none;
+          background-color: #f43715;
+          color: white;
+          display: flex;
+          gap: 5px;
+          align-items: center;
+          border-width: 1px;
+          border-style: solid;
+        }
+      }
+    }
+
+    .user-info {
+      width: 100%;
+      height: calc(100% - $header-height);
+      // margin-bottom: 20px;
+      padding: 0 25px;
+      padding-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      flex-grow: 1;
+      .user-info-item {
+        width: 100%;
+        // height: 50px;
+        padding: 10px 20px 10px 40px;
+        background-color: white;
+        border-radius: 7px;
+
+        .user-info-item-title {
+          font-size: 18px;
+          font-weight: 500;
+          color: #0f2f21;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #bababa;
+          margin-bottom: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+
+          .edit-btn {
+            border: none;
+            outline: none;
+            background-color: #f5664d;
+            padding: 7px 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+          }
+
+          .edit-btn.disabled {
+            background-color: #bababa;
+            cursor: not-allowed;
+          }
+        }
+
+        .user-info-item-content {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 20px 10px;
+
+          .subinfo-item {
+            width: calc(100% / 3 - 10px);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            .title {
+              font-size: 14px;
+              font-weight: 300;
+              color: #8c8e8d;
+            }
+            .value {
+              font-size: 15px;
+              font-weight: 500;
+              color: #0f2f21;
+            }
+          }
+        }
+
+        .user-info-item-content.list-shipping-info,
+        .user-info-item-content.list-order-info {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+
+          .shipping-info-item,
+          .order-info-item {
+            width: 100%;
+            padding: 10px 15px;
+            border: #b6b4b4 1px solid;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px 10px;
+          }
+        }
+
+        .user-info-item-content.list-order-info {
+          .order-info-item {
+            position: relative;
+            .edit-btn {
+              border: none;
+              outline: none;
+              background-color: #f5664d;
+              padding: 7px 10px;
+              border-radius: 5px;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              color: white;
+              position: absolute;
+              right: 10px;
+              top: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

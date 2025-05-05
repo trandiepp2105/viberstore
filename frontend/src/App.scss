@@ -1,0 +1,89 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: var(--main-font);
+}
+
+body {
+  color: #4a4a4a;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.5;
+  // font-family: Roboto, sans-serif !important;
+}
+
+a {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+input,
+button,
+a {
+  border: none;
+  outline: none;
+}
+
+button {
+  cursor: pointer;
+  background-color: transparent;
+}
+
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 999; // Đặt thấp hơn block-choose-discount
+  transform: none; // Loại bỏ nếu có
+  filter: none; // Loại bỏ nếu có
+}
+
+.main-content {
+  width: 100%;
+  // width: 1256px;
+  // width: 1200px;
+  // box-sizing: border-box;
+  flex: 1;
+  margin: 0 auto;
+  // position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  .page {
+    width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 20px;
+  }
+}
+
+/* Swiper css */
+.swiper {
+  width: 100%;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.swiper-slide {
+  text-align: center;
+  height: auto !important;
+  /* height: calc((100% - 30px) / 2) !important; */
+
+  /* Center slide text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

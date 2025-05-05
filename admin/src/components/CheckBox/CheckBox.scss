@@ -1,0 +1,42 @@
+/* Checkbox.scss */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+
+  input {
+    display: none;
+  }
+
+  .checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #555;
+    border-radius: 4.5px;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .label {
+    margin-left: 8px;
+  }
+
+  input:checked + .checkmark {
+    background-color: #4f49fd;
+    border-color: #4f49fd;
+  }
+
+  input:checked + .checkmark::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 0.5px;
+    width: 4px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+}

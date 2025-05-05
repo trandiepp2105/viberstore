@@ -1,0 +1,52 @@
+.search-bar {
+  width: 100%;
+  padding: 0 10px;
+  .search-bar-inner {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    height: 25px;
+    border-radius: 100px;
+    border: 1px solid #404d5f;
+    padding: 5px;
+    gap: 10px;
+
+    &:has(input:hover, input:focus) {
+      border-color: white !important;
+      input::placeholder {
+        color: rgb(122, 122, 122);
+      }
+      svg {
+        path {
+          fill: white;
+        }
+
+        circle {
+          stroke: white;
+        }
+      }
+    }
+    .search-icon {
+      width: 15px;
+      height: 15px;
+
+      svg {
+        rect {
+          fill: none;
+        }
+      }
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      color: #ebebeb;
+
+      &::placeholder {
+        color: #404d5f;
+      }
+    }
+  }
+}

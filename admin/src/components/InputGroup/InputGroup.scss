@@ -1,0 +1,37 @@
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 3px;
+  .input-label {
+    font-size: 1em;
+    font-weight: 400;
+    color: #413f3f;
+    //   margin-bottom: 5px;
+  }
+
+  .input-field {
+    height: 35px;
+    border-radius: 8px;
+    border: 1px solid #d1cfcf;
+    //   margin-bottom: 3px;
+    padding: 0 10px;
+    font-size: 0.8em;
+    //   width: 90%;
+    //   width: 258px;
+    &:focus {
+      outline: none;
+      border-color: var(--sign-up-font-color);
+    }
+  }
+
+  .error-text {
+    font-size: 0.8em;
+    color: #d70018;
+    // margin-top: 3px;
+
+    &::before {
+      // content: "⚠ ";
+      content: "* ";
+    }
+  }
+}

@@ -1,0 +1,95 @@
+.payment-page {
+  .payment-page-inner {
+    width: 100%;
+    padding: 20px 0;
+    .payment-response-box {
+      width: 650px;
+      margin: 0 auto;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid #eaedf1;
+      box-shadow: 0 4px 8px rgba(33, 38, 44, 0.16);
+      font-size: 14px;
+      line-height: 1.4;
+      letter-spacing: -0.03em;
+      color: #21262c;
+
+      .response-box__header {
+        border-bottom: 1px solid #eaedf1;
+        padding-left: 24px;
+        padding-right: 24px;
+
+        .box-header-inner {
+          padding-top: 16px;
+          padding-bottom: 16px;
+          min-height: 72px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      .response-box__content {
+        padding-left: 24px;
+        padding-right: 24px;
+
+        .content-inner {
+          margin: 0 auto;
+          max-width: 360px;
+          padding: 64px 0;
+
+          .wrapper-notify-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .notify-title {
+            word-break: break-word;
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.4;
+            font-weight: 500;
+            text-align: center;
+          }
+
+          .notify-title.error {
+            color: #c91d1d;
+          }
+
+          .notify-title.success {
+            color: #1d9e1d;
+          }
+
+          .gateway-response {
+            font-size: 16px;
+            text-align: center;
+          }
+
+          .order-description-box {
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin-top: 24px;
+            background-color: #f5f7f9;
+            .description-item {
+              width: 100%;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 8px;
+
+              .title {
+                color: #5a7087 !important;
+              }
+
+              .value {
+                color: #21262c !important;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

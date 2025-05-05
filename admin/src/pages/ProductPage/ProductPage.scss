@@ -1,0 +1,253 @@
+@import "../../styles/variables";
+
+.product-page {
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+  display: flex;
+
+  .page-content {
+    flex-grow: 1;
+    .header {
+      height: $header-height;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 25px;
+      padding-left: 25px;
+      .actions {
+        display: flex;
+        gap: 15px;
+        margin-right: 15px;
+        .btn {
+          padding: 5px 10px;
+          border-radius: 5px;
+          border: none;
+          outline: none;
+          background-color: #151a1f;
+          color: white;
+          font-size: 14px;
+          display: flex;
+          gap: 5px;
+          align-items: center;
+          border-width: 1px;
+          border-style: solid;
+          border-color: none;
+        }
+
+        .btn-export {
+          background-color: white;
+          color: black;
+          border-color: #1a1f24 !important;
+        }
+
+        .btn-add {
+          svg {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+    .quick-access-bar {
+      box-sizing: border-box;
+      width: 100%;
+      border-bottom: 1px solid #bababa;
+      padding: 5px 0;
+      padding-left: 25px;
+      padding-right: 10px;
+      height: 50px;
+      padding-bottom: 10px;
+      // background-color: red;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .left-side,
+      .right-side {
+        height: 100%;
+      }
+      .left-side {
+        .filter-order-by-status-bar {
+          height: 100%;
+          // width: 100px;
+          padding: 2px;
+          border-radius: 7px;
+          border: 1px solid #bababa;
+          display: flex;
+          align-items: center;
+          gap: 1px;
+          .status-item {
+            height: 100%;
+            cursor: pointer;
+            border-radius: 6px;
+            border: none;
+            outline: none;
+            padding: 0 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+
+            &:hover {
+              background-color: #cccbf5;
+            }
+          }
+
+          .status-item.active {
+            background-color: #cccbf5 !important;
+          }
+        }
+      }
+
+      .right-side {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        .search-bar {
+          height: 100%;
+          border-radius: 7px;
+          border: 1px solid #bababa;
+          min-width: 200px;
+          padding: 0 !important;
+          display: flex;
+          align-items: center;
+          // gap: 5px;
+          .wrapper-search-icon {
+            height: 100%;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .search-input {
+            border: none;
+            outline: none;
+            background-color: transparent;
+            color: #545454;
+          }
+        }
+
+        .wrapper-filter-box {
+          height: 100%;
+          width: 80px;
+          position: relative;
+
+          .toggle-filter-popup-btn {
+            color: #545454;
+            border: none;
+            outline: none;
+            height: 100%;
+            width: 100%;
+            border-radius: 7px;
+            border: 1px solid #bababa;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            padding: 0 10px;
+          }
+        }
+      }
+    }
+    .filter-bar {
+      width: 100%;
+      //   margin: 0 25px;
+      display: flex;
+      padding-left: 25px;
+      .list-active-filter {
+        display: flex;
+        gap: 10px;
+
+        .filter-item {
+          position: relative;
+          padding: 5px 10px;
+          background-color: #1a1f24;
+          color: white;
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          cursor: pointer;
+
+          .wrapper-filter-popup {
+            position: absolute;
+            z-index: 1;
+            top: calc(100% + 5px);
+            left: 0;
+            display: none;
+          }
+
+          .wrapper-filter-popup.active {
+            display: block;
+          }
+        }
+      }
+    }
+
+    .divider {
+      display: block;
+      width: 100%;
+      height: 1px;
+      background-color: #bababa;
+      margin: 10px 0;
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+
+        top: 0;
+        left: -25px;
+        height: 1px;
+        background-color: #bababa;
+        width: 25px;
+      }
+    }
+
+    .list-product {
+      padding-left: 15px;
+      // .Mui-checked {
+      //   color: #ff5722 !important; // Màu checkbox khi được chọn
+      // }
+      // .MuiPaper-root {
+      //   box-shadow: none !important;
+      //   background-color: transparent !important;
+
+      //   .css-yseucu-MuiDataGrid-columnHeaderRow {
+      //     background: none !important;
+      //   }
+
+      //   .Mui-checked {
+      //     color: #ff5722 !important; // Màu checkbox khi được chọn
+      //   }
+      // }
+      // .MuiDataGrid-root {
+      //   border: none; // Bỏ viền bảng
+      // }
+
+      .MuiDataGrid-columnHeaders {
+        background-color: #f0f2f5 !important;
+        color: #000;
+      }
+
+      // .MuiDataGrid-cell {
+      //   background-color: transparent; // Bỏ màu nền cell
+      // }
+
+      // .MuiDataGrid-row {
+      //   background-color: transparent; // Bỏ màu nền hàng
+      // }
+
+      // .MuiDataGrid-row:hover {
+      //   background-color: transparent; // Bỏ màu nền khi hover
+      // }
+    }
+  }
+
+  .statistics-side {
+    width: 25%;
+    border-left: 1px solid #bababa;
+  }
+}

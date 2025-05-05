@@ -1,0 +1,95 @@
+version: "3.8"
+services:
+  viberstore_backend:
+    container_name: viberstore_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - viberstore_mysql
+      - viberstore_redis
+    env_file:
+      - ./.env
+    networks:
+      - localnet
+    stdin_open: true
+    tty: true
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: elasticsearch:8.0.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      # - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}
+      # - ELASTIC_USERNAME=${ELASTIC_USERNAME}
+      # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    env_file:
+      - ./.env
+    ports:
+      - "9200:9200"
+    networks:
+      - localnet
+
+  viberstore_mysql:
+    image: mysql:8.0
+    container_name: viberstore_mysql
+    ports:
+      - "3309:3309"
+    env_file:
+      - ./.env
+    volumes:
+      - viberstore-mysql:/var/lib/mysql
+    restart: always
+    command:
+      - mysqld
+      - --port=3309
+    networks:
+      - localnet
+
+  viberstore_redis:
+    container_name: viberstore_redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    entrypoint: [
+        "sh",
+        "-c",
+        "mkdir -p /usr/local/etc/redis && \
+        echo 'bind 0.0.0.0\nport 6379\nmaxmemory-policy noeviction' > /usr/local/etc/redis/redis.conf && \
+        redis-server /usr/local/etc/redis/redis.conf",
+      ]
+    restart: "always"
+    volumes:
+      - redis-data:/data
+    networks:
+      - localnet
+  # viberstore_frontend:
+  #   container_name: viberstore_frontend
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "443:443" # Map HTTPS port
+  #     - "80:80" # Redirect HTTP to HTTPS
+  #   volumes:
+  #     - ./127.0.0.1-key.pem:/frontend/127.0.0.1-key.pem
+  #     - ./127.0.0.1.pem:/frontend/127.0.0.1.pem # Mount SSL certificates
+
+  #   env_file:
+  #     - ./.env
+  #   restart: always
+  #   networks:
+  #     - localnet
+
+volumes:
+  viberstore-mysql:
+  redis-data:
+
+networks:
+  localnet:
+    driver: bridge

@@ -1,0 +1,292 @@
+@import "../../styles/styles.module.scss";
+
+.footer {
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.1),
+    0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+  display: block;
+
+  .columns {
+    display: flex;
+    flex-wrap: wrap;
+
+    .column {
+      width: 25%;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+  }
+  .blockFooterTop {
+    background: #fff !important;
+    padding: 15px;
+    padding-bottom: 0;
+
+    .container {
+      box-sizing: border-box;
+      display: block;
+      height: 100%;
+      margin: 0 auto;
+      position: relative;
+      width: 1200px;
+
+      .columns {
+        .column {
+          .title {
+            font-size: 16px;
+            font-weight: 500;
+          }
+
+          .boxContent {
+            padding-left: 10px;
+
+            .listSwitchboard {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+              .switchboard {
+                font-size: 12px;
+                margin: 0;
+                margin-bottom: 5px;
+                padding: 0;
+                .tel {
+                  margin: 0 5px;
+                  text-decoration: none;
+                  font-weight: 700;
+                  cursor: pointer;
+                  color: #4a4a4a;
+                }
+              }
+            }
+
+            .listLink {
+              list-style: none;
+              display: flex;
+              flex-wrap: wrap;
+              .paymentMethod {
+                margin-right: 5px;
+                margin-bottom: 5px;
+                font-size: 12px;
+                border-radius: 3px;
+                border: 1px solid #dee2e6;
+                background-repeat: no-repeat;
+                height: 32px;
+                width: 50px;
+                cursor: pointer;
+                .bgPayment {
+                  height: auto;
+                  width: 100%;
+                  overflow-clip-margin: content-box;
+                  overflow: clip;
+                }
+              }
+
+              .link {
+                font-size: 12px;
+                margin-bottom: 5px;
+                width: 100%;
+                .appDowloader {
+                  .appDowloaderTitle {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                  }
+
+                  .appDowloaderContent {
+                    display: flex;
+                    margin-top: 8px;
+                    box-sizing: border-box;
+                    .QRImg {
+                      width: 40%;
+                    }
+
+                    .listAppStore {
+                      display: flex;
+                      flex-direction: column;
+                      box-sizing: border-box;
+                      .appStore {
+                        padding: 5px !important;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          .switchboardPhoneNumbers {
+            margin-bottom: 12px;
+          }
+
+          .subcriberForm {
+            margin-top: 10px;
+
+            .subcriberTitle {
+              font-size: 0.9em;
+            }
+
+            .redText {
+              color: #d70018;
+              font-size: 14px;
+            }
+
+            .subcriberTip {
+              color: #111;
+              font-size: 13px;
+              margin-bottom: 10px;
+            }
+
+            .inputControl {
+              margin-bottom: 0.75rem !important;
+              box-sizing: border-box;
+              clear: both;
+              font-size: 1rem;
+              position: relative;
+              text-align: inherit;
+
+              .subcriberInput {
+                height: 30px;
+                padding: 3px 10px;
+                background-color: #fff;
+                border-color: #dbdbdb;
+                border-radius: 4px;
+                color: #363636;
+                box-sizing: border-box;
+              }
+            }
+
+            .wrapperCheckboxFormRule {
+              margin-bottom: 12px;
+              cursor: pointer;
+              line-height: 1.25;
+              position: relative;
+
+              .subcriberLabelFormRule {
+                display: flex;
+                gap: 5px;
+                .subcriberFormRuleCheckbox {
+                  color: #7a7a7a;
+                  cursor: not-allowed;
+                }
+
+                .subcriberFormRule {
+                  text-decoration: none;
+                  color: #d70018;
+                  font-size: 13px;
+                  cursor: pointer;
+                  font-weight: 600;
+                  display: block;
+                }
+              }
+            }
+
+            .groupButton {
+              .subcriberButton {
+                background-color: #d70018;
+                border: none;
+                border-radius: 7px;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 600;
+                width: 100%;
+                height: fit-content;
+              }
+            }
+          }
+
+          .listSocial {
+            display: flex;
+
+            .socialLogo {
+              margin-bottom: 10px;
+              padding-right: 10px;
+            }
+          }
+
+          .corpMembers {
+            .corpMember {
+              margin-bottom: 5px;
+              width: 100%;
+
+              .corpMemberName {
+                color: #3f3f3f;
+                font-size: 12px;
+                font-weight: 400;
+                line-height: 16px;
+                margin-bottom: 5px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .blockFooterBottom {
+    background: #f8f8f8;
+    min-height: 100px;
+    padding: 15px;
+    padding-top: 0;
+    .container {
+      box-sizing: border-box;
+      display: block;
+      height: 100%;
+      margin: 0 auto;
+      position: relative;
+      width: 1200px;
+
+      .summaryCategory {
+        margin-bottom: 5px;
+        .row {
+          display: flex;
+          align-items: center;
+          justify-content: start;
+          gap: 5px;
+          .rowItem {
+            color: inherit;
+            font-size: 10px;
+            font-weight: 400;
+            line-height: 2;
+          }
+        }
+      }
+      .companyInformation {
+        .companyAddress {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: rgba(0, 0, 0, 0.5);
+          font-size: 10px;
+          line-height: 2;
+          margin-bottom: 5px;
+        }
+
+        .companyCertification {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 5px;
+
+          .companyCertificationLink {
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &:first-child {
+              .companyCertificationLogo {
+                height: 30px;
+              }
+            }
+
+            &:last-child {
+              .companyCertificationLogo {
+                height: 20px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

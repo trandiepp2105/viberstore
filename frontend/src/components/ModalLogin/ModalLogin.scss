@@ -1,0 +1,98 @@
+.modal-login {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+
+  .modal-login-inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 350px;
+    height: 230px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    // margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+    .close {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      cursor: pointer;
+    }
+
+    .title {
+      line-height: 1.125;
+      color: #d70018;
+      font-size: 25px;
+      font-weight: 600;
+    }
+
+    .wrapper-assistant-logo {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .description {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 20px;
+      padding: 1px;
+      text-align: center;
+    }
+
+    .group-login-btn {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+
+      .link-button {
+        border-radius: 8px;
+        box-shadow: 0 0 20px #eee;
+        cursor: pointer;
+        display: flex;
+        flex: 1;
+        font-weight: 600;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 10px;
+        text-align: center;
+        transition: 0.5s;
+        width: calc(50% - 8px);
+        font-weight: 600;
+        font-size: 1em;
+      }
+      .register-btn {
+        border: 2px solid #dd2440;
+
+        background: linear-gradient(90deg, #ff512f, #dd2440 51%, #ff512f);
+        -webkit-background-clip: text;
+        color: #dd2440;
+      }
+
+      .login-btn {
+        background-image: linear-gradient(90deg, #ff512f, #dd2440 51%, #ff512f);
+        color: #fff;
+      }
+    }
+  }
+}

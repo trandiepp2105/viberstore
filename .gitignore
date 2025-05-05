@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+node_modules
+*.pnp
+*.pnp.js
+.vscode
+# # Ignore all files
+# *
+
+# # Track only .py files
+# !*.py
+

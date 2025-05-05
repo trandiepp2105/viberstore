@@ -1,0 +1,178 @@
+.deliver-address-page {
+  width: 100%;
+
+  .deliver-address-page-inner {
+    width: 100%;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+
+      .title-name {
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        line-height: 32px !important;
+        color: #090d14;
+      }
+
+      .add-address-btn {
+        font-weight: 500 !important;
+        font-size: 14px !important;
+        line-height: 20px !important;
+        border-radius: 1.5rem !important;
+        height: 2.5rem !important;
+        background-color: #dc2626;
+        color: #fff;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        padding: 0 0.75rem;
+      }
+    }
+
+    .list-address {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .address-item {
+        outline: none !important;
+        border: none;
+        padding: 1rem !important;
+        border-top: 0;
+        border-left: 0;
+        border-right: 0;
+        border-bottom-color: rgb(228 232 237) !important;
+        border-style: solid !important;
+        border-bottom-width: 1px !important;
+
+        background-color: #fff;
+        border-radius: 0.75rem !important;
+
+        .address-item-inner {
+          display: flex;
+          gap: 0.5rem !important;
+          .wrapper-icon {
+            background-color: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem !important;
+            height: 3rem !important;
+          }
+
+          .address-content {
+            flex: 1;
+
+            .first-line {
+              display: flex;
+              align-items: center;
+
+              .recipient-name {
+                font-size: 16px !important;
+                font-weight: 600 !important;
+                line-height: 24px !important;
+                color: #090d14;
+              }
+              .devider {
+                width: 1px;
+                height: 20px;
+                background-color: #e4e4e7;
+                margin: 0 0.5rem;
+              }
+              .recipient-phone {
+                font-size: 14px !important;
+                font-weight: 500 !important;
+                line-height: 20px !important;
+                color: #4b5563;
+              }
+            }
+
+            .specific-address {
+              font-size: 14px !important;
+              line-height: 20px !important;
+            }
+          }
+
+          .address-services {
+            display: flex;
+            align-items: center;
+
+            .address-service-btn {
+              border: none;
+              outline: none;
+              background-color: transparent;
+              font-size: 16px !important;
+              line-height: 24px !important;
+              font-weight: 600 !important;
+              color: #dc2626;
+            }
+
+            .address-service-btn.edit-btn {
+              color: #090d14;
+            }
+
+            .devider {
+              width: 1px;
+              height: 20px;
+              background-color: #e4e4e7;
+              margin: 0 0.5rem;
+            }
+          }
+        }
+
+        .set-default-address {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          //   margin-top: 0.125rem;
+          justify-content: space-between;
+          padding-left: 3.5rem;
+          .address-status {
+            padding: 2px 4px;
+            border-radius: 0.25rem;
+            font-size: 12px !important;
+            line-height: 16px !important;
+            //   background-color:  #ee4d2d;
+            color: #ee4d2d;
+            border: 1px solid #ee4d2d;
+          }
+          .set-default-address-btn {
+            border: none;
+            outline: none;
+            background-color: transparent;
+            font-size: 14px !important;
+            line-height: 20px !important;
+            font-weight: 500 !important;
+            color: #4b5563;
+            border: #090d14 1px solid;
+            padding: 5px 10px;
+            border-radius: 0.25rem;
+            cursor: pointer;
+          }
+        }
+      }
+      .empty-order {
+        height: 600px;
+        text-align: center;
+        width: 100%;
+
+        .empty-order-inner {
+          align-items: center;
+          background: #fff;
+          border-radius: 0.125rem;
+          box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          justify-content: center;
+          overflow: hidden;
+          width: 100%;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,112 @@
+.login-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // margin-top: 10px !important;
+  width: 100vw !important;
+  margin-bottom: 0 !important;
+  .login-layout {
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      // align-items: center;
+      justify-content: center;
+      min-width: 350px;
+      aspect-ratio: 315 / 385;
+      padding: 20px 40px;
+      border-radius: 15px;
+      background-color: white;
+      box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.67);
+      -webkit-box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.67);
+      -moz-box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.67);
+      .login-title {
+        font-size: 1.5em;
+        font-weight: 500;
+        text-align: center;
+        // margin-bottom: 15px;
+        color: var(--sign-up-font-color);
+      }
+      .login-description {
+        font-size: 0.8em;
+        text-align: center;
+      }
+      .custom-input {
+        height: 40px;
+      }
+      .forget-password-link {
+        font-size: 0.8em;
+        display: block;
+        width: 100% !important;
+        text-align: right;
+        margin: 0;
+        padding: 0;
+        margin-top: 3px;
+      }
+
+      .wrapper-remember-password {
+        display: flex;
+        align-items: center;
+        font-size: 0.8em;
+        label {
+          cursor: pointer;
+        }
+        .remember-password-checkbox {
+          margin-right: 10px;
+          width: 17px;
+          height: 17px;
+          cursor: pointer;
+        }
+      }
+
+      .login-button {
+        margin-bottom: 10px;
+      }
+      .wrapper-sign-up-link {
+        display: flex;
+        justify-content: center;
+        font-size: 0.8em;
+        .sign-up-link {
+          margin-left: 4px;
+        }
+      }
+      .wrapper-login-method-label {
+        width: 100%;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        .divider {
+          height: 1px;
+          background-color: black;
+          width: 25%;
+        }
+
+        .login-method-label {
+          font-size: 12px;
+        }
+      }
+      .wrapper-list-login-method {
+        margin-top: 3px;
+        width: 100%;
+        height: 35px;
+        display: flex;
+        justify-content: space-evenly;
+        .login-method {
+          height: 35px;
+          aspect-ratio: 200 / 64;
+          border: 1px solid #413f3f;
+          border-radius: 7px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+          font-size: 18px;
+          img {
+            height: 70%;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,182 @@
+.coupon-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+
+  .container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .popup-inner {
+      // display: block;
+      width: 300px;
+      background-color: white;
+      border-radius: 7px;
+
+      padding: 10px;
+
+      .title {
+        font-size: 20px;
+        font-weight: 500;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .popup-content {
+        width: 100%;
+        display: flex;
+        // flex-direction: column;
+        gap: 10px;
+        flex-wrap: wrap;
+        .input-container {
+          width: calc(100% - 10px);
+          .date-picker {
+          }
+          .wrapper-input {
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #c4c2c2;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+
+            textarea {
+              width: 100%;
+              padding: 7px 0;
+              padding-left: 15px;
+              padding-right: 5px;
+              color: #313131;
+              border: none;
+              outline: none;
+              resize: none;
+              border-radius: 10px;
+            }
+            input {
+              width: 100%;
+              padding: 7px 0;
+              padding-left: 15px;
+              padding-right: 5px;
+              color: #313131;
+              border: none;
+              outline: none;
+            }
+          }
+          .wrapper-input.select-type {
+            position: relative;
+            cursor: pointer;
+            padding-left: 15px;
+            svg {
+              position: absolute;
+              top: 50%;
+              right: 10px;
+              transform: translateY(-50%);
+              color: #989898;
+            }
+            .options {
+              position: absolute;
+              top: calc(100% + 5px);
+              left: 0;
+              width: 100%;
+              background-color: white;
+              border-radius: 5px;
+              border: 1px solid #c4c2c2;
+              box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+              z-index: 10;
+
+              .option {
+                width: 100%;
+                padding: 10px 15px;
+                color: #313131;
+                font-size: 14px;
+                font-weight: 400;
+                cursor: pointer;
+                &:hover {
+                  background-color: #f3acac;
+                }
+                &:last-child {
+                  border-radius: 0 0 5px 5px;
+                }
+                &:first-child {
+                  border-radius: 5px 5px 0 0;
+                }
+              }
+              .option.active {
+                background-color: #f3acac;
+              }
+            }
+          }
+          .input-title {
+            color: #313131;
+            margin-bottom: 2px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .word-limit {
+              font-size: 10px;
+              color: #989898;
+              font-weight: 400;
+            }
+          }
+
+          .input-text {
+            width: 100%;
+            padding: 7px 0;
+            padding-left: 15px;
+            padding-right: 5px;
+            color: #313131;
+            border: #989898 1px solid;
+            border-radius: 10px;
+          }
+
+          .input-text:focus {
+            outline: none;
+            border: #f3acac 1px solid;
+          }
+
+          .input-text.text-area {
+            resize: none;
+          }
+        }
+        .input-container.half-width {
+          width: calc(50% - 10px) !important;
+        }
+      }
+
+      .popup-service {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        gap: 10px;
+        margin-top: 20px;
+
+        .popup-btn {
+          outline: none;
+          border-radius: 10px;
+          border: #1d3b79 1px solid;
+
+          padding: 5px 10px;
+          color: white;
+
+          background-color: #1d3b79;
+          font-weight: 500;
+        }
+
+        .popup-btn.cancel-btn {
+          border: #f03c0f 1px solid;
+          background-color: white;
+          color: #f03c0f;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+.logout-popup {
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  transition-duration: 0.15s;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+  .popup {
+    width: 300px;
+    border-radius: 1rem;
+    --tw-bg-opacity: 1;
+    background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+    transition-duration: 0.15s;
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+    .popup-header {
+      //   padding: 0.75rem 1rem;
+      height: 40px;
+
+      width: 100%;
+      position: relative;
+      .close {
+        cursor: pointer;
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        height: fit-content;
+      }
+    }
+    .popup-main {
+      width: 100%;
+
+      img {
+        width: 100%;
+      }
+
+      .popup-title {
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        line-height: 24px !important;
+        color: #090d14 !important;
+        text-align: center;
+        margin-top: 1rem !important;
+        margin-bottom: 0.25rem !important;
+      }
+      .popup-description {
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        font-size: 14px !important;
+        line-height: 20px !important;
+        font-weight: 400 !important;
+        color: #6b7280 !important;
+        text-align: center;
+      }
+    }
+    .popup-footer {
+      padding: 1rem;
+      display: flex;
+      width: 100%;
+      gap: 10px;
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px !important;
+        font-weight: 500;
+        line-height: 24px !important;
+        border-radius: 0.5rem;
+        height: 3rem;
+        width: calc(50% - 5px);
+
+        &:hover {
+          filter: brightness(0.9);
+
+          transition-duration: 0.15s;
+          transition-property: all;
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+      }
+
+      button.logout-button {
+        --red-red-7: #dc2626;
+        border: 1px solid var(--red-red-7);
+        --tw-bg-opacity: 1;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+        color: var(--red-red-7);
+      }
+
+      button.close-button {
+        --red-red-7: #dc2626;
+        background-color: var(--red-red-7);
+        color: white;
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const apiAdmin = axios.create({
-  baseURL: "http://26.178.178.33:8000/api/v1", // Thay bằng URL backend của bạn
+  baseURL: `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}/api/v1`, // Thay bằng URL backend của bạn
   timeout: 10000, // Thời gian chờ
   withCredentials: true, // Sử dụng cookie cho CORS
   headers: {

@@ -2,7 +2,7 @@
 FROM node:20 AS build
 
 # Đặt thư mục làm việc trong container cho giai đoạn build
-WORKDIR /frontend
+WORKDIR /admin
 
 # Sao chép package.json và package-lock.json (hoặc yarn.lock)
 # Tận dụng Docker layer caching
@@ -21,7 +21,7 @@ RUN npm run build
 FROM nginx:1.25-alpine 
 
 # Sao chép build output từ stage 'build' vào thư mục web root của Nginx
-COPY --from=build /frontend/build /usr/share/nginx/html
+COPY --from=build /admin/build /usr/share/nginx/html
 
 # Sao chép file cấu hình Nginx tùy chỉnh cho HTTP
 # File này sẽ định nghĩa Nginx lắng nghe trên port 80

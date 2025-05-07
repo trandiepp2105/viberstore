@@ -3,7 +3,7 @@
 echo "Waiting for elasticsearch to be ready..."
 
 # Kiểm tra trạng thái của elasticsearch, thử lại nếu thất bại
-until curl -s -u "$ELASTIC_USERNAME:$ELASTIC_PASSWORD" "http://${ELASTICSEARCH_HOST}:9200" | grep -q cluster_name; do
+until curl -s -u "$ELASTIC_USERNAME:$ELASTIC_PASSWORD" "$ELASTICSEARCH_URL" | grep -q cluster_name; do
   echo "Elasticsearch is unavailable - waiting..."
   sleep 5
 done

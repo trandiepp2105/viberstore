@@ -1,5 +1,35 @@
 version: "3.8"
+
 services:
+  # Service cho Frontend (Client) React App
+  viberstore_frontend:
+    container_name: viberstore_frontend
+    build:
+      context: ./frontend # Đường dẫn đến thư mục chứa Dockerfile của frontend
+      dockerfile: Dockerfile
+    ports:
+      # Map port 8081 của VM (host) vào port 80 của container frontend
+      # Nginx reverse proxy trên VM sẽ trỏ đến http://127.0.0.1:8081
+      - "8081:80"
+    restart: unless-stopped
+    networks:
+      - localnet
+
+  # Service cho Admin React App
+  viberstore_admin:
+    container_name: viberstore_admin # Đổi tên cho nhất quán, hoặc giữ viberstore_admin nếu muốn
+    build:
+      context: ./admin # Đường dẫn đến thư mục chứa Dockerfile của admin
+      dockerfile: Dockerfile
+    ports:
+      # Map port 8082 của VM (host) vào port 80 của container admin
+      # Nginx reverse proxy trên VM sẽ trỏ đến http://127.0.0.1:8082
+      - "8082:80"
+    restart: unless-stopped
+    networks:
+      - localnet
+
+  # Backend Service (giữ nguyên cấu hình của bạn)
   viberstore_backend:
     container_name: viberstore_backend
     build:
@@ -8,7 +38,7 @@ services:
     volumes:
       - ./backend:/backend
     ports:
-      - "8000:8000"
+      - "8000:8000" # Backend Django/Node.js/etc. chạy trên port 8000
     depends_on:
       - viberstore_mysql
       - viberstore_redis
@@ -19,38 +49,43 @@ services:
     stdin_open: true
     tty: true
 
+  # Elasticsearch Service (giữ nguyên cấu hình của bạn)
   elasticsearch:
     container_name: elasticsearch
     image: elasticsearch:8.0.0
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=true
-      # - ELASTICSEARCH_HOST=${ELASTICSEARCH_HOST}
-      # - ELASTIC_USERNAME=${ELASTIC_USERNAME}
-      # - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD} # Đã có trong env_file
     env_file:
       - ./.env
     ports:
       - "9200:9200"
+    volumes: # Thêm volume để dữ liệu Elasticsearch tồn tại
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    restart: unless-stopped # Thêm restart policy
     networks:
       - localnet
 
+  # MySQL Service (giữ nguyên và điều chỉnh một chút)
   viberstore_mysql:
     image: mysql:8.0
     container_name: viberstore_mysql
     ports:
+      # Port 3309 của VM map vào port 3309 bên trong container (do command của bạn)
       - "3309:3309"
     env_file:
       - ./.env
     volumes:
       - viberstore-mysql:/var/lib/mysql
-    restart: always
+    restart: always # Giữ nguyên 'always' nếu bạn muốn, 'unless-stopped' cũng là lựa chọn tốt
     command:
       - mysqld
-      - --port=3309
+      - --port=3309 # MySQL bên trong container sẽ chạy trên port 3309
     networks:
       - localnet
 
+  # Redis Service (giữ nguyên cấu hình của bạn)
   viberstore_redis:
     container_name: viberstore_redis
     image: redis:latest
@@ -63,32 +98,16 @@ services:
         echo 'bind 0.0.0.0\nport 6379\nmaxmemory-policy noeviction' > /usr/local/etc/redis/redis.conf && \
         redis-server /usr/local/etc/redis/redis.conf",
       ]
-    restart: "always"
+    restart: "always" # Giữ nguyên 'always' nếu bạn muốn, 'unless-stopped' cũng là lựa chọn tốt
     volumes:
       - redis-data:/data
     networks:
       - localnet
-  # viberstore_frontend:
-  #   container_name: viberstore_frontend
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "443:443" # Map HTTPS port
-  #     - "80:80" # Redirect HTTP to HTTPS
-  #   volumes:
-  #     - ./127.0.0.1-key.pem:/frontend/127.0.0.1-key.pem
-  #     - ./127.0.0.1.pem:/frontend/127.0.0.1.pem # Mount SSL certificates
-
-  #   env_file:
-  #     - ./.env
-  #   restart: always
-  #   networks:
-  #     - localnet
 
 volumes:
   viberstore-mysql:
   redis-data:
+  elasticsearch-data: # Thêm volume cho Elasticsearch
 
 networks:
   localnet:

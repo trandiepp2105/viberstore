@@ -40,8 +40,8 @@ services:
     ports:
       - "8000:8000" # Backend Django/Node.js/etc. chạy trên port 8000
     depends_on:
-      - viberstore_mysql
-      - viberstore_redis
+      viberstore_mysql:
+        condition: service_healthy
     env_file:
       - ./.env
     networks:
@@ -67,21 +67,38 @@ services:
     networks:
       - localnet
 
-  # MySQL Service (giữ nguyên và điều chỉnh một chút)
   viberstore_mysql:
     image: mysql:8.0
     container_name: viberstore_mysql
     ports:
-      # Port 3309 của VM map vào port 3309 bên trong container (do command của bạn)
       - "3309:3309"
     env_file:
       - ./.env
     volumes:
       - viberstore-mysql:/var/lib/mysql
-    restart: always # Giữ nguyên 'always' nếu bạn muốn, 'unless-stopped' cũng là lựa chọn tốt
+      - ./initial_data:/docker-entrypoint-initdb.d
+      - ./mysql_custom_conf:/etc/mysql/conf.d
+    restart: always
     command:
-      - mysqld
-      - --port=3309 # MySQL bên trong container sẽ chạy trên port 3309
+      # - mysqld
+      - --port=3309
+    # command:
+    #   [
+    #     "/bin/bash",
+    #     "-c",
+    #     "chmod +x /docker-entrypoint-initdb.d/99_create_import_done_flag.sh && exec mysqld --port=3309",
+    #   ]
+
+    healthcheck:
+      # Kiểm tra sự tồn tại của file cờ hiệu
+      test: ["CMD-SHELL", "test -f /var/lib/mysql/initial_data_imported.flag"]
+      interval: 5s # Kiểm tra mỗi 5 giây
+      timeout: 2s # Timeout cho mỗi lần kiểm tra
+      retries:
+        72 # Thử lại tối đa 72 lần (tương đương 6 phút chờ: 72 * 5s)
+        # Điều chỉnh số lần thử lại (retries) và start_period dựa trên
+        # kích thước file SQL của bạn và thời gian import dự kiến.
+      start_period: 60s # Chờ 60 giây sau khi container khởi động rồi mới bắt đầu
     networks:
       - localnet
 

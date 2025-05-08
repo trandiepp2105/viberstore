@@ -22,11 +22,14 @@ done
 echo "MySQL at $MYSQL_HOST:$MYSQL_PORT is ready."
 
 
-# Keep the container running
-tail -f /dev/null
+# # Keep the container running
+# tail -f /dev/null
 
 # echo "Run Django server"
 # python manage.py makemigrations
-# python manage.py migrate
+echo "Migrate database"
+python manage.py migrate
 # python manage.py create_admin
-# python manage.py runserver 0.0.0.0:8000
+
+echo "running server"
+python manage.py runserver 0.0.0.0:8000

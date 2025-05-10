@@ -4,9 +4,6 @@ node_modules
 *.pnp
 *.pnp.js
 .vscode
-# # Ignore all files
-# *
+.env
 
-# # Track only .py files
-# !*.py
 

@@ -256,5 +256,5 @@ _(Create a `LICENSE` file in your root directory with the MIT license text if yo
 
 ---
 
-**Author:** [Your Van Diep Tran]
-**GitHub:** [https://github.com/trandiepp2105]
+**Author:** Van Diep Tran
+**GitHub:** https://github.com/trandiepp2105

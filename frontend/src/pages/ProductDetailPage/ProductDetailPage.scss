@@ -336,6 +336,24 @@
         }
       }
     }
+    .wrapper-list-product {
+        width: 100%;
+
+        .list-product {
+          width: 100%;
+          display: flex;
+          gap: 20px; /* Increase column gap to 40px */
+          // flex-wrap: wrap;
+          overflow: hidden;
+          justify-content: space-between;
+          .wrapper-product-item {
+            flex: 0 0 calc((100% / 4) - (40px * 3 / 4)) !important; /* Adjust for new gap */
+            width: calc(
+              (100% / 4) - (40px * 3 / 4)
+            ) !important; /* Adjust for new gap */
+          }
+        }
+    }
   }
   .similar-products {
     width: 100%;

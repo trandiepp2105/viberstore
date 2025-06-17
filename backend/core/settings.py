@@ -285,8 +285,11 @@ if (not CELERY_BROKER_URL or not CELERY_RESULT_BACKEND) and not DEBUG:
     print("WARNING: Celery Broker/Result backend URL not configured. Celery tasks might not work.")
 
 # ==============================================================================
-# ELASTICSEARCH CONFIGURATION (nếu bạn dùng thư viện như django-elasticsearch-dsl)
+# ELASTICSEARCH CONFIGURATION (TẠM THỜI COMMENT - KHÔNG SỬ DỤNG)
 # ==============================================================================
+# Tạm thời không sử dụng Elasticsearch để giảm tải tài nguyên và độ phức tạp
+# Có thể bỏ comment khi cần tích hợp tìm kiếm nâng cao
+
 # ELASTICSEARCH_DSL_URL = os.environ.get('ELASTICSEARCH_URL') # http://elasticsearch:9200 từ .env
 # ELASTICSEARCH_DSL_USER = os.environ.get('ELASTIC_USERNAME')
 # ELASTICSEARCH_DSL_PASS = os.environ.get('ELASTIC_PASSWORD')

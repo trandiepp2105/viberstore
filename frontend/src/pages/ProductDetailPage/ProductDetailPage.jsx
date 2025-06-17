@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import "./ProductDetailPage.scss";
+
 import { useParams, useNavigate } from "react-router-dom";
 
 import productService from "../../services/productService";
@@ -421,11 +422,11 @@ const ProductDetailPage = () => {
           <div className="list-product">
             {newArrivalProducts?.map((product, index) => {
               return (
-                <div className="product-item" key={product.id}>
+                <div className="wrapper-product-item" key={product.id}>
                   <ProductContainer
                     key={index}
                     productGeneralInfo={product}
-                    className="product-item"
+                    // className="product-item"
                   />
                 </div>
               );

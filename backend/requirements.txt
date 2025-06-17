@@ -13,7 +13,7 @@ pillow-avif-plugin
 pillow-heif
 pyheif
 requests
-elasticsearch-dsl >= 8.0.0
+# elasticsearch-dsl >= 8.0.0  # Tạm thời comment vì không sử dụng
 pandas
 celery
 django-celery-beat

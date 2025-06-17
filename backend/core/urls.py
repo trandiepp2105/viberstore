@@ -21,6 +21,8 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.static import serve
+from django.urls import re_path
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -44,4 +46,12 @@ urlpatterns = [
     
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files trong cả development và production
+# Trong production thực tế, nên dùng web server như Nginx để serve static files
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # Serve media files ngay cả khi DEBUG=False (cho development/testing)
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]

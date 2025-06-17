@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class RegisterView(APIView):
-
+    permission_classes = []  # Không yêu cầu authentication cho register
+    
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
         data = request.data

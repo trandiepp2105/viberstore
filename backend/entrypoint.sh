@@ -1,14 +1,15 @@
 #!/bin/sh
 
-echo "Waiting for elasticsearch to be ready..."
+# Tạm thời comment việc kiểm tra Elasticsearch
+# echo "Waiting for elasticsearch to be ready..."
 
-# Kiểm tra trạng thái của elasticsearch, thử lại nếu thất bại
-until curl -s -u "$ELASTIC_USERNAME:$ELASTIC_PASSWORD" "$ELASTICSEARCH_URL" | grep -q cluster_name; do
-  echo "Elasticsearch is unavailable - waiting..."
-  sleep 5
-done
+# # Kiểm tra trạng thái của elasticsearch, thử lại nếu thất bại
+# until curl -s "$ELASTICSEARCH_URL" | grep -q cluster_name; do
+#   echo "Elasticsearch is unavailable - waiting..."
+#   sleep 5
+# done
 
-echo "Elasticsearch is ready!"
+# echo "Elasticsearch is ready!"
 
 echo "Waiting for MySQL to be ready..."
 

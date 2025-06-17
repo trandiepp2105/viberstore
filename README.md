@@ -2,8 +2,8 @@
 
 A full-stack fashion e-commerce website built with a Django backend and ReactJS for the frontend and admin panel. The application allows users to browse products, manage their cart, place orders with online payment, and manage their account. It features OTP verification for secure registration, uses Elasticsearch for enhanced search capabilities, and is deployed using Docker on Microsoft Azure.
 
-**Live Application URL:** [http://20.198.225.85](http://20.198.225.85)
-_(Please note: This is a public IP address. The frontend might be accessible on port 80 and the admin panel on port 8082 as per backend configuration: `http://20.198.225.85` for frontend, `http://20.198.225.85:8082` for admin. DNS is not yet configured for a custom domain.)_
+**Live Application URL:** [http://4.241.129.97:8081](http://4.241.129.97:8081)
+_(Please note: This is a public IP address. The frontend might be accessible on port 80 and the admin panel on port 8082 as per backend configuration: `http://4.241.129.97:8081` for frontend, `http://4.241.129.97:8082` for admin. DNS is not yet configured for a custom domain.)_
 
 ## ✨ Features
 

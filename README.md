@@ -1,5 +1,8 @@
 # Fashion E-commerce Platform (Django & React)
 
+![ViberStore - Fashion E-commerce Platform](./assets/image1.png)
+*Modern and intuitive shopping experience with ViberStore*
+
 A full-stack fashion e-commerce website built with a Django backend and ReactJS for the frontend and admin panel. The application allows users to browse products, manage their cart, place orders with online payment, and manage their account. It features OTP verification for secure registration, uses Elasticsearch for enhanced search capabilities, and is deployed using Docker on Microsoft Azure.
 
 **Live Application URL:** [http://4.241.129.97:8081](http://4.241.129.97:8081)

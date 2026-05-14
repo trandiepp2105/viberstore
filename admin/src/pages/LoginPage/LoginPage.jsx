@@ -148,7 +148,7 @@ const LoginPage = () => {
           <div className="wrapper-list-login-method">
             <button className="login-method">
               <img
-                src={`/assets/images/gg-logo.png`}
+                src={`${process.env.PUBLIC_URL}/assets/images/gg-logo.png`}
                 alt="gg-logo"
                 className="login-method-logo"
               />
@@ -157,7 +157,7 @@ const LoginPage = () => {
 
             <button className="login-method">
               <img
-                src={`/assets/images/apple-logo.png`}
+                src={`${process.env.PUBLIC_URL}/assets/images/apple-logo.png`}
                 alt="apple-logo"
                 className="login-method-logo"
               />

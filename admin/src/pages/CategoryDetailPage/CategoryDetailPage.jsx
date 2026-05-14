@@ -436,7 +436,10 @@ const CategoryDetailPage = () => {
               <p className="info-title">Icon Category</p>
               <div className="wrapper-cate-icon">
                 <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/assets/kid-svgrepo-com.svg`}
+                    alt=""
+                  />
                 </div>
                 <input
                   type="file"

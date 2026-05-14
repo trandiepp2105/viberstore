@@ -281,7 +281,10 @@ const CategoryPage = () => {
             <div className="category-statistics-item">
               <div className="wrapper-cate-icon">
                 <div className="cate-icon">
-                  <img src="/assets/men-fashion.svg" alt="" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/assets/men-fashion.svg`}
+                    alt=""
+                  />
                 </div>
               </div>
               <p className="cate-name">Total Men's Fashsion</p>
@@ -298,7 +301,10 @@ const CategoryPage = () => {
             <div className="category-statistics-item">
               <div className="wrapper-cate-icon">
                 <div className="cate-icon">
-                  <img src="/assets/women-fashion.svg" alt="" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/assets/women-fashion.svg`}
+                    alt=""
+                  />
                 </div>
               </div>
               <p className="cate-name">Total Women's Fashsion</p>
@@ -315,7 +321,10 @@ const CategoryPage = () => {
             <div className="category-statistics-item">
               <div className="wrapper-cate-icon">
                 <div className="cate-icon">
-                  <img src="/assets/kid-svgrepo-com.svg" alt="" />
+                  <img
+                    src={`${process.env.PUBLIC_URL}/assets/kid-svgrepo-com.svg`}
+                    alt=""
+                  />
                 </div>
               </div>
               <p className="cate-name">Total Kid's Fashsion</p>

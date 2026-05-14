@@ -5,7 +5,7 @@ const WaitingOverlay = () => {
     <div className="waiting-overlay">
       <div className="wrapper-assistant-logo">
         <img
-          src="/assets/images/assistant-non-bg.png"
+          src={`${process.env.PUBLIC_URL}/assets/images/assistant-non-bg.png`}
           alt=""
           className="assistant-logo"
         />

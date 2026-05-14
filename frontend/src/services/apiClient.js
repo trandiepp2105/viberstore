@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import getCSRFToken from "./csrf"; // Import hàm lấy CSRF token
 const apiClient = axios.create({
-  baseURL: `http://${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}/api/v1`, // Thay bằng URL backend của bạn
+  baseURL: process.env.REACT_APP_API_BASE_URL || "/api/v1",
   timeout: 10000, // Thời gian chờ
   withCredentials: true, // Sử dụng cookie cho CORS
   headers: {

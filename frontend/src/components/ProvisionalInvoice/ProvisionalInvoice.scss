@@ -18,9 +18,9 @@
 
       align-items: center;
       cursor: pointer;
-      transform: none; // Loại bỏ nếu có
-      opacity: 1; // Loại bỏ nếu có
-      z-index: auto; // Loại bỏ nếu có
+      transform: none;
+      opacity: 1;
+      z-index: auto;
       .box-discount__title {
         font-size: 14px !important;
         line-height: 20px !important;
@@ -58,8 +58,8 @@
         position: absolute;
         right: 0.75rem;
         display: inline-block;
-        width: 36px; // Thay đổi chiều rộng
-        height: 20px; // Thay đổi chiều cao
+        width: 36px;
+        height: 20px;
 
         input {
           opacity: 0;
@@ -76,18 +76,18 @@
           bottom: 0;
           background-color: #ccc;
           transition: 0.4s;
-          border-radius: 20px; // Thêm border-radius để nó tròn hơn nếu cần
+          border-radius: 20px;
 
           &:before {
             position: absolute;
             content: "";
-            height: 16px; // Điều chỉnh kích thước của vòng tròn con
-            width: 16px; // Điều chỉnh kích thước của vòng tròn con
-            left: 2px; // Điều chỉnh vị trí vòng tròn bên trong
-            bottom: 2px; // Điều chỉnh vị trí vòng tròn bên trong
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
             background-color: white;
             transition: 0.4s;
-            border-radius: 50%; // Để tạo ra vòng tròn
+            border-radius: 50%;
           }
         }
 
@@ -103,7 +103,7 @@
 
         // Khi input được checked, slider trước sẽ di chuyển
         input:checked + .slider:before {
-          transform: translateX(16px); // Di chuyển vòng tròn 16px
+          transform: translateX(16px);
         }
 
         // Rounded sliders
@@ -266,7 +266,7 @@
   width: 100vw;
   height: 100vh;
   animation: fadeIn 0.5s forwards;
-  z-index: 9999 !important; // Đảm bảo z-index cao hơn
+  z-index: 9999 !important;
   background-color: hsla(0, 0%, 100%, 0.808);
   display: flex;
   justify-content: end;

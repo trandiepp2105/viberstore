@@ -1,6 +1,5 @@
 from django.db import models
 from marketing.enums import PromotionType
-# Create your models here.
 class Promotion(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()

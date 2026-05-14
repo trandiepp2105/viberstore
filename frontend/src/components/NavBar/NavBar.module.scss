@@ -325,11 +325,11 @@
       &:hover::after {
         content: "";
         position: absolute;
-        top: 100%; /* Dưới thẻ cha */
+        top: 100%;
         left: 0;
         right: 0;
-        height: 5px; /* Khoảng cách 5px */
-        z-index: 1; /* Đảm bảo không đè modal */
+        height: 5px;
+        z-index: 1;
       }
       .accountService {
         display: none;

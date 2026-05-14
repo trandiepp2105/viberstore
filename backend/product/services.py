@@ -271,8 +271,8 @@ class CategoryService:
             raise ValueError("Category name is required.")
 
         # Tạo slug duy nhất
-        slug = _generate_unique_slug(Category, name) # Giả sử hàm này tồn tại và đúng
-        validated_data['slug'] = slug # Gán slug vào validated_data
+        slug = _generate_unique_slug(Category, name)
+        validated_data['slug'] = slug
 
         try:
             # Tạo category trực tiếp từ validated_data

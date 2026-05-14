@@ -3,8 +3,8 @@ import Cookies from "js-cookie";
 
 const apiAdmin = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL || "/api/v1",
-  timeout: 10000, // Thời gian chờ
-  withCredentials: true, // Sử dụng cookie cho CORS
+  timeout: 10000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -39,7 +39,7 @@ const retryRequest = (error, newToken) => {
 const refreshToken = async () => {
   try {
     const response = await apiAdmin.post("/auth/refresh-token/");
-    const newToken = response.data.access; // Giả sử token mới trả về có trong trường `access`
+    const newToken = response.data.access;
 
     // Gửi lại các request đã bị lỗi trước đó
     refreshSubscribers.forEach((callback) => callback(newToken));

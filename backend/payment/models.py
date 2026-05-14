@@ -18,7 +18,6 @@ class PaymentMethod(models.Model):
     class Meta:
         db_table = "payment_method"
     
-# Create your models here.
 class Payment(models.Model):
     order = models.ForeignKey('order.Order', on_delete=models.CASCADE, related_name='payments')
     status = models.ForeignKey(PaymentStatus, null=True, on_delete=models.SET_NULL, related_name="payments")

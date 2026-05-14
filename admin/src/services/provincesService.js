@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const provincesApiClient = axios.create({
-  baseURL: "https://provinces.open-api.vn/api/", // Thay bằng URL backend của bạn
-  timeout: 10000, // Thời gian chờ
+  baseURL: "https://provinces.open-api.vn/api/",
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },

@@ -1,6 +1,5 @@
 from django.db import models
 from product.models import Product, ProductVariant
-# Create your models here.
 
 class CartItem(models.Model):
     user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='cart_items')
@@ -29,5 +28,4 @@ class CartItem(models.Model):
     
     class Meta:
         db_table = 'cart_item'
-
 

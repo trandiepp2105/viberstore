@@ -238,7 +238,7 @@ class CategoryListCreateAPIView(APIView):
             # Yêu cầu là Admin (is_staff=True) cho các phương thức khác (POST)
             permission_classes = [permissions.IsAdminUser] # Sử dụng quyền IsAdminUser của DRF
             # Hoặc dùng custom permission:
-            # from .permissions import IsAdminUser # Nếu bạn tạo file permissions.py
+            # from .permissions import IsAdminUser
             # permission_classes = [IsAdminUser]
 
         # Trả về một list các instance của các lớp permission
@@ -820,7 +820,6 @@ class ProductVariantListCreateAPIView(APIView):
         operation_summary="List Product Variants",
         operation_description="Retrieves a list of product variants. Can be filtered by product (via URL path or query param 'product'), active status, size ID, color ID, or SKU search.",
         manual_parameters=[
-            # Thêm các filter query params nếu cần thiết cho endpoint không lồng nhau
             openapi.Parameter('active', openapi.IN_QUERY, description="Filter by active status ('true' or 'false')", type=openapi.TYPE_BOOLEAN, required=False),
             openapi.Parameter('size', openapi.IN_QUERY, description="Filter by Size ID", type=openapi.TYPE_INTEGER, required=False),
             openapi.Parameter('color', openapi.IN_QUERY, description="Filter by Color ID", type=openapi.TYPE_INTEGER, required=False),
@@ -897,12 +896,12 @@ class ProductVariantListCreateAPIView(APIView):
         elif 'product' not in variant_data:
              return Response({"product": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
         if request.data['size_names']:
-            variant_data['size_names'] = [s.strip() for s in request.data['size_names'].split(',')]  # Tách thành list và loại bỏ khoảng trắng
-        variant_data['color_name'] = request.data.get('color_name', None)  # Đảm bảo trường này tồn tại
-        variant_data['hex_code'] = request.data.get('hex_code', None)  # Đảm bảo trường này tồn tại
-        variant_data['stock'] = request.data.get('stock', 0)  # Đảm bảo trường này tồn tại
-        variant_data['weight_grams'] = request.data.get('weight_grams', None)  # Đảm bảo trường này tồn tại
-        variant_data['image_url'] = request.data.get('image_url', None)  # Đảm bảo trường này tồn tại
+            variant_data['size_names'] = [s.strip() for s in request.data['size_names'].split(',')]
+        variant_data['color_name'] = request.data.get('color_name', None)
+        variant_data['hex_code'] = request.data.get('hex_code', None)
+        variant_data['stock'] = request.data.get('stock', 0)
+        variant_data['weight_grams'] = request.data.get('weight_grams', None)
+        variant_data['image_url'] = request.data.get('image_url', None)
         print("variant_data: ", variant_data)
 
         try:

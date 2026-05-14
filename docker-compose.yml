@@ -16,11 +16,11 @@ services:
     networks:
       - localnet
 
-  # Service cho Frontend (Client) React App
+  # Frontend service
   viberstore_frontend:
     container_name: viberstore_frontend
     build:
-      context: ./frontend # Đường dẫn đến thư mục chứa Dockerfile của frontend
+      context: ./frontend
       dockerfile: Dockerfile
     expose:
       - "80"
@@ -28,11 +28,11 @@ services:
     networks:
       - localnet
 
-  # Service cho Admin React App
+  # Admin service
   viberstore_admin:
-    container_name: viberstore_admin # Đổi tên cho nhất quán, hoặc giữ viberstore_admin nếu muốn
+    container_name: viberstore_admin
     build:
-      context: ./admin # Đường dẫn đến thư mục chứa Dockerfile của admin
+      context: ./admin
       dockerfile: Dockerfile
       args:
         PUBLIC_URL: /dashboard
@@ -42,7 +42,7 @@ services:
     networks:
       - localnet
 
-  # Backend Service (giữ nguyên cấu hình của bạn)
+  # Backend service
   viberstore_backend:
     container_name: viberstore_backend
     build:
@@ -62,7 +62,7 @@ services:
     stdin_open: true
     tty: true
 
-  # Elasticsearch Service (tạm thời comment để không sử dụng)
+  # Elasticsearch service (disabled)
   # elasticsearch:
   #   container_name: elasticsearch
   #   image: elasticsearch:8.0.0
@@ -75,9 +75,9 @@ services:
   #     - ./.env
   #   ports:
   #     - "9200:9200"
-  #   volumes: # Thêm volume để dữ liệu Elasticsearch tồn tại
+  #   volumes:
   #     - elasticsearch-data:/usr/share/elasticsearch/data
-  #   restart: unless-stopped # Thêm restart policy
+  #   restart: unless-stopped
   #   ulimits:
   #     memlock:
   #       soft: -1
@@ -99,7 +99,6 @@ services:
       - ./mysql_custom_conf:/etc/mysql/conf.d
     restart: always
     command:
-      # - mysqld
       - --port=3309
     # command:
     #   [
@@ -109,19 +108,15 @@ services:
     #   ]
 
     healthcheck:
-      # Kiểm tra sự tồn tại của file cờ hiệu
       test: ["CMD-SHELL", "test -f /var/lib/mysql/initial_data_imported.flag"]
-      interval: 5s # Kiểm tra mỗi 5 giây
-      timeout: 2s # Timeout cho mỗi lần kiểm tra
-      retries:
-        72 # Thử lại tối đa 72 lần (tương đương 6 phút chờ: 72 * 5s)
-        # Điều chỉnh số lần thử lại (retries) và start_period dựa trên
-        # kích thước file SQL của bạn và thời gian import dự kiến.
-      start_period: 15s # Chờ 15 giây sau khi container khởi động rồi mới bắt đầu
+      interval: 5s
+      timeout: 2s
+      retries: 72
+      start_period: 15s
     networks:
       - localnet
 
-  # Redis Service (giữ nguyên cấu hình của bạn)
+  # Redis service
   viberstore_redis:
     container_name: viberstore_redis
     image: redis:latest
@@ -134,7 +129,7 @@ services:
         echo 'bind 0.0.0.0\nport 6379\nmaxmemory-policy noeviction' > /usr/local/etc/redis/redis.conf && \
         redis-server /usr/local/etc/redis/redis.conf",
       ]
-    restart: "always" # Giữ nguyên 'always' nếu bạn muốn, 'unless-stopped' cũng là lựa chọn tốt
+    restart: "always"
     volumes:
       - redis-data:/data
     networks:
@@ -143,7 +138,6 @@ services:
 volumes:
   viberstore-mysql:
   redis-data:
-  # elasticsearch-data: # Tạm thời comment vì không sử dụng Elasticsearch
 
 networks:
   localnet:

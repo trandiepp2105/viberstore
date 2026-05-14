@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils import timezone
-# Create your models here.
 from product.enums import SupplierStatus
-from django.core.exceptions import ObjectDoesNotExist # Import để xử lý lỗi không tìm thấy
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 class Supplier(models.Model):
     company_name = models.CharField(max_length=255, verbose_name="Company Name", unique=True)
@@ -178,4 +177,3 @@ class ProductVariant(models.Model):
 
     class Meta:
         db_table = 'product_variant'
-

@@ -1,13 +1,13 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import getCSRFToken from "./csrf"; // Import hàm lấy CSRF token
+import getCSRFToken from "./csrf";
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL || "/api/v1",
-  timeout: 10000, // Thời gian chờ
-  withCredentials: true, // Sử dụng cookie cho CORS
+  timeout: 10000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
-    "X-CSRFToken": getCSRFToken(), // Thêm CSRF token vào header
+    "X-CSRFToken": getCSRFToken(),
   },
 });
 
@@ -40,7 +40,7 @@ const retryRequest = (error, newToken) => {
 const refreshToken = async () => {
   try {
     const response = await apiClient.post("/auth/refresh-token/");
-    const newToken = response.data.access; // Giả sử token mới trả về có trong trường `access`
+    const newToken = response.data.access;
 
     // Gửi lại các request đã bị lỗi trước đó
     refreshSubscribers.forEach((callback) => callback(newToken));

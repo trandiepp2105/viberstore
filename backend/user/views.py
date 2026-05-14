@@ -175,20 +175,6 @@ class LogoutView(APIView):
             print("Error: ", e)
             raise AuthenticationFailed('Invalid token')
 
-# class CustomTokenRefreshView(TokenRefreshView):
-#     def post(self, request, *args, **kwargs):
-#         # Bạn có thể thêm logic kiểm tra thêm trước khi làm mới token nếu cần
-#         # Ví dụ: Kiểm tra token trong request
-        
-#         # Gọi super() để duy trì hành vi mặc định của TokenRefreshView
-#         response = super().post(request, *args, **kwargs)
-
-#         # Nếu bạn muốn tùy chỉnh response, có thể chỉnh sửa ở đây
-#         # Ví dụ: Thêm thông tin vào response
-#         response.data["message"] = "Token refresh thành công"
-        
-#         return response
-
 class RefreshTokenView(APIView):
     permission_classes = []
     @swagger_auto_schema(
@@ -315,43 +301,6 @@ class PasswordRessetView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         
-# class ForgotPasswordRequestView(APIView):
-#     """
-#     Gửi OTP đến email của người dùng để đặt lại mật khẩu.
-#     """
-
-#     @swagger_auto_schema(
-#         operation_description="Gửi OTP đến email để đặt lại mật khẩu.",
-#         request_body=VerifyEmailSerializer,
-#     )
-#     def post(self, request):
-#         serializer = VerifyEmailSerializer(data=request.data)
-#         if serializer.is_valid():
-#             email = serializer.validated_data["email"]
-#             user = User.objects.filter(email=email).first()
-
-#             if not user:
-#                 return Response(
-#                     {"message": "Người dùng không tồn tại."},
-#                     status=status.HTTP_404_NOT_FOUND,
-#                 )
-
-#             # Gửi OTP qua email
-#             send_html_email(email)
-#             return Response(
-#                 {"message": "OTP đã được gửi đến email của bạn."},
-#                 status=status.HTTP_200_OK,
-#             )
-
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class VerifyOTPView(APIView):
-#     def post(self, request):
-#         serializer = VerifyOTPSerializer(data=request.data)
-#         if serializer.is_valid():
-#             # OTP hợp lệ, trả về trạng thái xác thực thành công
-#             return Response({"message": "Xác thực OTP thành công."}, status=status.HTTP_200_OK)
-
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # class ResetPasswordView(APIView):

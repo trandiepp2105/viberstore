@@ -46,9 +46,9 @@ img {
   width: 100%;
   position: fixed;
   top: 0;
-  z-index: 999; // Đặt thấp hơn block-choose-discount
-  transform: none; // Loại bỏ nếu có
-  filter: none; // Loại bỏ nếu có
+  z-index: 999;
+  transform: none;
+  filter: none;
 }
 
 .main-content {

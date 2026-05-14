@@ -22,13 +22,17 @@ if not SECRET_KEY:
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 
+APP_HOST = os.environ.get('APP_HOST', 'localhost').strip()
+APP_SCHEME = os.environ.get('APP_SCHEME', 'http').strip()
+APP_BASE_URL = f"{APP_SCHEME}://{APP_HOST}" if APP_HOST else None
+
 # ==============================================================================
 # ORIGIN & ALLOWED HOSTS CONFIGURATION (Sử dụng Public IP của VM và các port khác nhau)
 # ==============================================================================
 # FRONTEND_ORIGIN ví dụ: http://20.198.225.85 (không có port nếu là port 80)
 # ADMIN_ORIGIN ví dụ: http://20.198.225.85:8088 (có port)
-FRONTEND_ORIGIN_CONFIG = os.environ.get('FRONTEND_ORIGIN')
-ADMIN_ORIGIN_CONFIG = os.environ.get('ADMIN_ORIGIN')
+FRONTEND_ORIGIN_CONFIG = os.environ.get('FRONTEND_ORIGIN') or APP_BASE_URL
+ADMIN_ORIGIN_CONFIG = os.environ.get('ADMIN_ORIGIN') or APP_BASE_URL
 
 CSRF_TRUSTED_ORIGINS = []
 if FRONTEND_ORIGIN_CONFIG:
@@ -70,6 +74,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS_STR = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,viberstore_backend')
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',') if host.strip()]
+if APP_HOST and APP_HOST not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(APP_HOST)
 if not ALLOWED_HOSTS: # Đảm bảo không rỗng
     ALLOWED_HOSTS = ['localhost', '127.0.0.1'] # Fallback tối thiểu
 
@@ -175,7 +181,7 @@ TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = '/static/'
+STATIC_URL = '/django-static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static') # Thư mục để `collectstatic` trong Dockerfile
 
 MEDIA_URL = '/media/'
@@ -250,7 +256,7 @@ if not CACHES['default']['LOCATION'] and not DEBUG:
 # ==============================================================================
 # VNPAY CONFIGURATION
 # ==============================================================================
-VNPAY_RETURN_URL = os.environ.get('VNPAY_RETURN_URL') # Sẽ là http://<VM_IP>/payment từ .env
+VNPAY_RETURN_URL = os.environ.get('VNPAY_RETURN_URL') or (f"{APP_BASE_URL}/payment" if APP_BASE_URL else None)
 VNPAY_PAYMENT_URL = os.environ.get('VNPAY_PAYMENT_URL')
 VNPAY_API_URL = os.environ.get('VNPAY_API_URL')
 VNPAY_TMN_CODE = os.environ.get('VNPAY_TMN_CODE')

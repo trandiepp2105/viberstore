@@ -4,6 +4,9 @@ FROM node:20 AS build
 # Đặt thư mục làm việc trong container cho giai đoạn build
 WORKDIR /admin
 
+ARG PUBLIC_URL=/dashboard
+ENV PUBLIC_URL=${PUBLIC_URL}
+
 # Sao chép package.json và package-lock.json (hoặc yarn.lock)
 # Tận dụng Docker layer caching
 COPY package*.json ./

@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import style from "./BannerTop.module.css";
 const BannerTop = () => {
   const imagePaths = [
-    "/assets/images/bannerTop1.svg",
-    "/assets/images/bannerTop2.svg",
-    "/assets/images/bannerTop3.svg",
+    `${process.env.PUBLIC_URL}/assets/images/member.svg`,
+    `${process.env.PUBLIC_URL}/assets/images/delivery.svg`,
+    `${process.env.PUBLIC_URL}/assets/images/phone.svg`,
   ];
   return (
     <div className={style.bannerTop}>

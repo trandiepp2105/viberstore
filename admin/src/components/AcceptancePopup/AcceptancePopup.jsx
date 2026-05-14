@@ -40,7 +40,10 @@ const AcceptancePopup = ({
           </svg>
         </button>
         <div className="wrapper-assistant-logo">
-          <img src="/assets/assistant-non-bg.png" alt="" />
+          <img
+            src={`${process.env.PUBLIC_URL}/assets/assistant-non-bg.png`}
+            alt=""
+          />
         </div>
         <p className="description">{description}</p>
         <div className="group-login-btn">

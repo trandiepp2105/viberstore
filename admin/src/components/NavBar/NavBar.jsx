@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import "./NavBar.scss";
 import "../../styles/_variables.scss";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import userService from "../../services/userService";
 // toast
 import { toast } from "react-toastify";
 const NavBar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log(location.pathname);
@@ -17,7 +18,7 @@ const NavBar = () => {
       const response = await userService.logout();
       if (response) {
         toast.success("Logout successfully");
-        window.location.href = "/login";
+        navigate("/login");
       }
     } catch (error) {
       toast.error("Logout failed");

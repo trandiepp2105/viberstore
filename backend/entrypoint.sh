@@ -11,26 +11,51 @@
 
 # echo "Elasticsearch is ready!"
 
-echo "Waiting for MySQL to be ready..."
+echo "Waiting for MySQL to accept application connections..."
 
-# Kiểm tra trạng thái của MySQL, thử lại nếu thất bại
-until mysqladmin ping -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" --silent; do
+# until mysql \
+#   --host="$MYSQL_HOST" \
+#   # --port="$MYSQL_PORT" \
+#   --user="$MYSQL_USER" \
+#   --password="$MYSQL_PASSWORD" \
+#   --database="$MYSQL_DATABASE" \
+#   --protocol=TCP \
+#   --ssl-mode=DISABLED \
+#   --execute="SELECT 1;" >/tmp/mysql-check.log 2>&1
+# do
+#   echo "MySQL at $MYSQL_HOST:$MYSQL_PORT is not ready yet:"
+#   cat /tmp/mysql-check.log
+#   sleep 5
+# done
+
+until mysqladmin ping \
+  -h "$MYSQL_HOST" \
+  -P "$MYSQL_PORT" \
+  -u "$MYSQL_USER" \
+  -p"$MYSQL_PASSWORD" \
+  --protocol=TCP \
+  --skip-ssl \
+  --silent
+do
   echo "MySQL at $MYSQL_HOST:$MYSQL_PORT is unavailable - waiting..."
   sleep 5
 done
 
-# Sửa: Thêm $MYSQL_PORT vào thông báo thành công
 echo "MySQL at $MYSQL_HOST:$MYSQL_PORT is ready."
+
 
 
 # # Keep the container running
 # tail -f /dev/null
 
-# echo "Run Django server"
-# python manage.py makemigrations
-echo "Migrate database"
-python manage.py migrate
-# python manage.py create_admin
+echo "Run Django server"
+python manage.py makemigrations
+# echo "Migrate database"
+# python manage.py migrate
+
+echo "Collect static files"
+python manage.py collectstatic --noinput
+python manage.py create_admin
 
 echo "running server"
 python manage.py runserver 0.0.0.0:8000

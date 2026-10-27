@@ -2,355 +2,110 @@
 
 ![ViberStore Preview](./assets/image1.png)
 
-ViberStore là một dự án e-commerce thời trang với:
+ViberStore là ứng dụng thương mại điện tử thời trang, gồm giao diện mua sắm cho khách hàng, trang quản trị và REST API. Hệ thống sử dụng React, Django REST Framework, MySQL, Redis và Nginx; các dịch vụ được đóng gói bằng Docker Compose.
 
-- `frontend/`: React app cho khách hàng
-- `admin/`: React app cho quản trị
-- `backend/`: Django REST API
-- `mysql`: dữ liệu chính
-- `redis`: cache / broker groundwork
-- `nginx`: reverse proxy đứng trước toàn hệ thống
+## Chức năng
 
-README này phản ánh trạng thái hiện tại của repo và cấu hình Docker Compose mới.
+### Dành cho khách hàng
 
-## Kiến trúc
+- Xem danh sách sản phẩm, bộ sưu tập và tìm kiếm sản phẩm.
+- Xem thông tin chi tiết, phân loại và biến thể sản phẩm.
+- Đăng ký, đăng nhập và khôi phục mật khẩu.
+- Quản lý giỏ hàng và địa chỉ giao hàng.
+- Đặt hàng, chọn phương thức thanh toán và thanh toán qua VNPay.
+- Theo dõi đơn hàng, xem lịch sử và gửi yêu cầu hủy đơn.
+- Đánh giá sản phẩm.
 
-Hệ thống chạy theo mô hình một entrypoint duy nhất qua `nginx`:
+### Dành cho quản trị viên
 
-- `/` -> frontend
-- `/dashboard/` -> admin React app
-- `/admin/` -> Django admin
-- `/api/` -> Django API
-- `/media/` -> user-uploaded files
-- `/django-static/` -> Django static files
+- Quản lý sản phẩm, danh mục và nhà cung cấp.
+- Quản lý đơn hàng và thông tin khách hàng.
+- Quản lý chương trình khuyến mãi và mã giảm giá.
+- Đăng nhập vào trang quản trị riêng.
 
-Lưu ý:
+## Công nghệ và cấu trúc
 
-- React build assets vẫn dùng `/static/...`
-- Django static đã được tách sang `/django-static/...` để tránh xung đột namespace
+- `frontend/`: React app cho khách hàng.
+- `admin/`: React app quản trị.
+- `backend/`: Django REST API, chia theo các miền sản phẩm, người dùng, giỏ hàng, đơn hàng, thanh toán, khuyến mãi, đánh giá và địa chỉ.
+- MySQL 8: cơ sở dữ liệu chính, khởi tạo từ `initial_data/` khi tạo volume lần đầu.
+- Redis: dịch vụ cache/broker.
+- Nginx: điểm truy cập HTTP và reverse proxy cho các ứng dụng.
 
-## Công nghệ chính
+Các đường dẫn chính qua Nginx:
 
-- Backend: Django, Django REST Framework
-- Frontend/Admin: React
-- Database: MySQL 8
-- Cache/Broker: Redis
-- Reverse proxy: Nginx
-- Containerization: Docker, Docker Compose
-- Payment: VNPay sandbox/live config qua env
+| Đường dẫn | Ứng dụng |
+| --- | --- |
+| `/` | Cửa hàng trực tuyến |
+| `/dashboard/` | Trang quản trị React |
+| `/admin/` | Django admin |
+| `/api/` | REST API |
+| `/media/` | Ảnh và tệp tải lên |
+| `/django-static/` | Tệp static của Django |
 
-## Cấu trúc thư mục
+## Triển khai
 
-```text
-.
-├── admin/                  # Admin React app
-├── backend/                # Django project
-├── frontend/               # Customer-facing React app
-├── initial_data/           # MySQL bootstrap SQL + init scripts
-├── mysql_custom_conf/      # MySQL custom config
-├── nginx/                  # Nginx reverse proxy config
-├── docker-compose.yml
-├── .env
-└── setup.sh
-```
+### Yêu cầu
 
-## Yêu cầu
-
-- Docker
+- Docker Engine
 - Docker Compose plugin (`docker compose`)
+- Tệp `.env` ở thư mục gốc dự án
 
-Nếu máy chưa có Docker, có thể dùng script:
+Tạo và cấu hình `.env` với các biến phù hợp môi trường, gồm `APP_HOST`, `APP_SCHEME`, `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, các biến `MYSQL_*`, `EMAIL_*`, `VNPAY_*`, `ADMIN_EMAIL` và `ADMIN_PASSWORD`. Không commit thông tin bí mật hoặc `.env` dùng cho production.
+
+Frontend và trang quản trị dùng API cùng origin qua Nginx, với base path `/api/v1`.
+
+### Development
+
+Stack development mount mã nguồn backend để tiện chỉnh sửa. Từ thư mục gốc dự án, chạy:
 
 ```bash
-./setup.sh --install-docker
+docker compose -f deploy/docker-compose.dev.yml up -d --build
 ```
 
-## Cấu hình môi trường
+Mở ứng dụng tại `http://localhost:8080`. MySQL được expose ở host port `3310`; backend và Redis chỉ truy cập qua mạng Docker.
 
-Repo dùng 3 lớp env:
+Xem trạng thái và log:
 
-1. Root `.env`
-   Dùng cho `docker-compose`, backend và MySQL.
-
-2. `frontend/.env`
-   Build-time env cho React frontend.
-
-3. `admin/.env`
-   Build-time env cho React admin.
-
-### Root `.env`
-
-Các biến quan trọng nhất:
-
-- `APP_HOST`
-- `APP_SCHEME`
-- `DJANGO_SECRET_KEY`
-- `DJANGO_DEBUG`
-- `MYSQL_*`
-- `EMAIL_*`
-- `VNPAY_*`
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-
-Thiết kế hiện tại cho phép bạn chỉ cần đổi IP/domain ở một chỗ:
-
-```env
-APP_HOST=192.168.10.43
-APP_SCHEME=http
+```bash
+docker compose -f deploy/docker-compose.dev.yml ps
+docker compose -f deploy/docker-compose.dev.yml logs -f
 ```
 
-Django sẽ tự suy ra:
+### Production
 
-- `ALLOWED_HOSTS`
-- `FRONTEND_ORIGIN`
-- `ADMIN_ORIGIN`
-- `VNPAY_RETURN_URL` nếu bạn không override riêng
+Điền secret mạnh và domain/IP thật vào `.env`, sau đó chạy từ thư mục gốc:
 
-### Frontend/Admin env
-
-Hiện tại cả `frontend/.env` và `admin/.env` đều tối giản:
-
-```env
-REACT_APP_API_BASE_URL=/api/v1
+```bash
+docker compose -f deploy/docker-compose.prod.yml up -d --build
 ```
 
-Nghĩa là frontend/admin gọi API qua reverse proxy thay vì gọi thẳng backend host:port.
+Nginx nhận kết nối HTTP tại port `80`. Truy cập cửa hàng ở `http://your-domain-or-ip/`, trang quản trị tại `http://your-domain-or-ip/dashboard/`, API tại `http://your-domain-or-ip/api/v1/` và Django admin tại `http://your-domain-or-ip/admin/`. Compose production hiện cũng map MySQL ra host ở port `3309`; Redis chỉ truy cập qua mạng Docker nội bộ.
 
-## Chạy local bằng Docker
+Swagger UI có tại `http://your-domain-or-ip/api/v1/swagger/schema`.
 
-### Cách nhanh nhất
+### Khởi chạy bằng script ở thư mục gốc
+
+Repo cũng có stack Compose ở `docker-compose.yml`. Script sau kiểm tra `.env`, chuẩn bị thư mục cần thiết, validate cấu hình và khởi động stack đó:
 
 ```bash
 ./setup.sh
 ```
 
-Script sẽ:
+Script hỗ trợ `--install-docker` để cài Docker Engine và Compose plugin trên Ubuntu nếu máy chưa có. Stack này dùng port `80` cho Nginx và `3309` cho MySQL.
 
-- kiểm tra `.env` và `docker-compose.yml`
-- cấp quyền cho script init MySQL
-- tạo sẵn các thư mục bind mount cần thiết
-- validate `docker compose config`
-- build và start toàn bộ stack
+## Dữ liệu và tài khoản quản trị
 
-### Chạy thủ công
+MySQL chạy các script trong `initial_data/` khi volume dữ liệu được tạo lần đầu. Khi volume đã tồn tại, việc khởi động lại container không nạp lại dữ liệu bootstrap. Xóa volume sẽ xóa dữ liệu MySQL/Redis đã lưu, vì vậy hãy sao lưu trước khi thực hiện thao tác đó.
 
-```bash
-docker compose up -d --build
-```
+Khi backend khởi động, `entrypoint.sh` gọi lệnh `create_admin`. Tài khoản được tạo từ `ADMIN_EMAIL` và `ADMIN_PASSWORD` trong `.env` nếu chưa tồn tại.
 
-Kiểm tra trạng thái:
+## Cấu hình thanh toán
 
-```bash
-docker compose ps
-```
-
-Xem log:
-
-```bash
-docker compose logs -f viberstore_nginx
-docker compose logs -f viberstore_backend
-docker compose logs -f viberstore_mysql
-```
-
-## URLs sau khi chạy
-
-Giả sử `APP_HOST=192.168.10.43`:
-
-- Frontend: `http://192.168.10.43/`
-- Admin: `http://192.168.10.43/dashboard/`
-- Django admin: `http://192.168.10.43/admin/`
-- API root: `http://192.168.10.43/api/v1/`
-- Swagger: `http://192.168.10.43/api/v1/swagger/schema`
-
-## Flow khởi động
-
-1. `viberstore_mysql` khởi động
-2. MySQL import SQL từ `initial_data/`
-3. script `initial_data/99_create_import_done_flag.sh` tạo file cờ hoàn tất import
-4. healthcheck MySQL chuyển sang `healthy`
-5. `viberstore_backend` khởi động, chờ MySQL sẵn sàng
-6. backend chạy:
-   - `makemigrations`
-   - `collectstatic`
-   - `create_admin`
-   - `runserver`
-7. `viberstore_nginx` nhận request và route đến frontend/admin/backend
-
-## Dữ liệu khởi tạo
-
-Thư mục `initial_data/` hiện chứa:
-
-- `01_viberstore_structure_and_data.sql`
-- `99_create_import_done_flag.sh`
-
-Mục đích:
-
-- bootstrap schema/data MySQL
-- tạo cờ `initial_data_imported.flag` để healthcheck biết import đã xong
-
-Lưu ý rất quan trọng:
-
-- nếu volume MySQL đã tồn tại, MySQL sẽ không chạy lại toàn bộ `docker-entrypoint-initdb.d`
-- nếu bạn muốn import lại từ đầu, cần reset volume
-
-Ví dụ:
-
-```bash
-docker compose down -v
-docker compose up -d --build
-```
-
-Lệnh trên sẽ xóa toàn bộ dữ liệu hiện có trong MySQL và Redis.
-
-## Admin mặc định
-
-Khi backend start, `entrypoint.sh` hiện đang gọi:
-
-```bash
-python manage.py create_admin
-```
-
-Nên nếu user admin chưa tồn tại, hệ thống sẽ tạo superuser theo:
-
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-
-được cấu hình trong root `.env`.
-
-## Migration và SQL dump
-
-Repo hiện đang ở trạng thái vừa có:
-
-- SQL bootstrap trong `initial_data/01_viberstore_structure_and_data.sql`
-- Django migrations trong `backend/*/migrations`
-
-Điều này có thể gây lệch giữa:
-
-- schema đã có sẵn trong DB
-- schema mà Django muốn tạo thêm qua `migrate`
-
-Nếu gặp lỗi kiểu:
-
-- `Duplicate column name ...`
-- `Dependency on app with no migrations ...`
-
-thì nguyên nhân thường là DB import từ SQL đã có schema trước rồi, trong khi Django migration tiếp tục muốn áp thêm thay đổi.
-
-Khi làm việc với phần DB, nên xác định rõ một trong hai hướng:
-
-1. SQL dump là nguồn sự thật, migrations được fake tương ứng
-2. Django migrations là nguồn sự thật, SQL chỉ dùng cho seed data
-
-## Các lệnh hay dùng
-
-Recreate container sau khi sửa root `.env`:
-
-```bash
-docker compose up -d --force-recreate
-```
-
-Build lại frontend/admin sau khi sửa React code hoặc `frontend/.env`, `admin/.env`:
-
-```bash
-docker compose up -d --build viberstore_frontend viberstore_admin
-```
-
-Build lại backend sau khi sửa code backend hoặc Dockerfile:
-
-```bash
-docker compose up -d --build viberstore_backend
-```
-
-Vào shell backend:
-
-```bash
-docker compose exec viberstore_backend sh
-```
-
-Chạy migrate thủ công:
-
-```bash
-docker compose exec viberstore_backend python manage.py migrate
-```
-
-## VNPay sandbox
-
-Các biến VNPay được lấy từ root `.env`.
-
-Nếu test sandbox, cần kiểm tra:
-
-- `VNPAY_PAYMENT_URL`
-- `VNPAY_API_URL`
-- `VNPAY_TMN_CODE`
-- `VNPAY_HASH_SECRET_KEY`
-- `VNPAY_RETURN_URL`
-
-`VNPAY_RETURN_URL` mặc định sẽ được suy ra thành:
-
-```text
-${APP_SCHEME}://${APP_HOST}/payment
-```
-
-nếu bạn không cấu hình riêng.
-
-## Troubleshooting
-
-### 1. `DisallowedHost`
-
-Nếu truy cập bằng IP LAN và Django báo:
-
-```text
-Invalid HTTP_HOST header
-```
-
-hãy kiểm tra lại:
-
-- `APP_HOST`
-- recreate backend:
-
-```bash
-docker compose up -d --force-recreate viberstore_backend
-```
-
-### 2. React assets 404 dưới `/static/...`
-
-Đã được xử lý bằng cách:
-
-- để React dùng `/static/...`
-- chuyển Django static sang `/django-static/...`
-
-Nếu vẫn lỗi, rebuild lại frontend và nginx.
-
-### 3. MySQL `ready for connections` nhưng backend vẫn chờ
-
-Thường do:
-
-- healthcheck đang chờ file cờ import
-- hoặc init SQL chưa hoàn tất
-
-Kiểm tra:
-
-```bash
-docker compose logs -f viberstore_mysql
-```
-
-### 4. Docker Desktop báo `path is not shared`
-
-Nếu project nằm dưới `/media/...` và Docker Desktop không mount được bind volume, hãy share thư mục project trong Docker Desktop File Sharing.
-
-## Git workflow gợi ý
-
-Nếu tách feature branch theo scope lớn:
-
-- `feature/backend`
-- `feature/deploy-docker`
-- `feature/frontend`
-
-Và merge tuần tự vào `develop`, sau đó merge `develop` vào `main` bằng merge commit riêng cho release.
+VNPay được cấu hình qua các biến `VNPAY_*` trong `.env`, gồm URL thanh toán, mã terminal, khóa bí mật và URL trả về. Mặc định URL trả về được tạo từ `APP_SCHEME` và `APP_HOST`, trừ khi bạn cấu hình riêng `VNPAY_RETURN_URL`.
 
 ## Ghi chú
 
-- `backend/static/` là thư mục generated từ `collectstatic`
-- `backend/media/` chứa file upload/media thực tế
-- không nên commit `.env` thật cho production
-- `runserver` hiện phù hợp cho dev/test hơn là production cứng
+- Backend hiện chạy bằng Django `runserver` theo `backend/entrypoint.sh`; cấu hình này phù hợp môi trường phát triển và kiểm thử.
+- Repo có cả SQL bootstrap trong `initial_data/` và Django migrations. Trước khi thao tác schema, cần xác định schema hiện có được quản lý theo hướng nào để tránh chạy lặp thay đổi.
+- `backend/media/` chứa tệp tải lên; `backend/static/` là đầu ra của `collectstatic`.

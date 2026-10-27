@@ -4,6 +4,7 @@ from product.enums import SupplierStatus
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
 class Supplier(models.Model):
+    """Model `Supplier` của domain `product`, biểu diễn nhà cung cấp với thông tin liên hệ, mã số thuế và trạng thái.. Thành phần chính: company_name, slug, contact_person, email, phone_number, address, tax_id, status, website, started_at, created_at, updated_at, save()."""
     company_name = models.CharField(max_length=255, verbose_name="Company Name", unique=True)
     slug = models.SlugField(max_length=255, unique=True, blank=True, verbose_name="Slug")
     contact_person = models.CharField(max_length=255, verbose_name="Contact Person")
@@ -21,18 +22,22 @@ class Supplier(models.Model):
     updated_at = models.DateTimeField(default=None, blank=True, null=True, verbose_name="Updated At")
 
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.company_name
 
     def save(self, *args, **kwargs):
+        """Lưu bản ghi và chuẩn hóa các field cần thiết trước khi ghi database."""
         if not self.slug:
             self.slug = slugify(self.company_name)
         self.updated_at = timezone.now()
         super().save(*args, **kwargs)
     
     class Meta:
+        """Khai báo metadata cho `Supplier`, gồm: db_table."""
         db_table = 'supplier'
     
 class Product(models.Model):
+    """Model `Product` của domain `product`, biểu diễn catalog product gồm supplier, tên, mô tả, giá, ảnh, trạng thái publish và các variant.. Thành phần chính: supplier, name, slug, description, cost_price, price, sale_price, is_published, publish_at, image_url, created_at, updated_at, delete(), save()."""
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, related_name="products")
     name = models.CharField(max_length=255, unique=True, verbose_name="Product Name")
     slug = models.SlugField(max_length=255, unique=True, default="product-name")
@@ -55,9 +60,11 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(default=None, blank=True, null=True, verbose_name="Updated At")
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.name
 
     class Meta:
+        """Khai báo metadata cho `Product`, gồm: db_table, ordering, indexes."""
         db_table = 'product'
         ordering = ['-created_at'] # Sắp xếp mặc định
         indexes = [
@@ -115,6 +122,7 @@ class Product(models.Model):
         super().save(*args, **kwargs) # Gọi phương thức save gốc
 
 class Category(models.Model):
+    """Model `Category` của domain `product`, biểu diễn danh mục sản phẩm có thể phân cấp bằng parent/subcategories.. Thành phần chính: name, parent, slug, description, image_url, created_at, updated_at."""
     name = models.CharField(max_length=255)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="subcategories")
     slug = models.SlugField(max_length=255, unique=True, default="category-name")
@@ -123,32 +131,40 @@ class Category(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(default=None, blank=True, null=True)
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.name  # Trả về tên của danh mục
 
     class Meta:
+        """Khai báo metadata cho `Category`, gồm: db_table."""
         db_table = 'category'
     
 class ProductCategory(models.Model):
+    """Model `ProductCategory` của domain `product`, biểu diễn quan hệ giữa product và category.. Thành phần chính: product, category."""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_categories")
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     class Meta:
+        """Khai báo metadata cho `ProductCategory`, gồm: db_table."""
         db_table = 'product_category'
 
 
 class Size(models.Model):
+    """Model `Size` của domain `product`, biểu diễn danh mục kích thước của variant.. Thành phần chính: name, description, created_at, updated_at."""
     name = models.CharField(max_length=255, verbose_name="Size Name")
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(default=None, blank=True, null=True, verbose_name="Updated At")
 
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.name  # Trả về tên của kích thước
 
     class Meta:
+        """Khai báo metadata cho `Size`, gồm: db_table."""
         db_table = 'size'
 
 class Color(models.Model):
+    """Model `Color` của domain `product`, biểu diễn danh mục màu và mã hex của variant.. Thành phần chính: name, hex_code, description, created_at, updated_at."""
     name = models.CharField(max_length=255, verbose_name="Color Name")
     hex_code = models.CharField(max_length=7, verbose_name="Hex Code")  # Mã màu HEX
     description = models.TextField(blank=True, null=True, verbose_name="Description")
@@ -156,12 +172,15 @@ class Color(models.Model):
     updated_at = models.DateTimeField(default=None, blank=True, null=True, verbose_name="Updated At")
 
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.name  # Trả về tên của màu sắc
 
     class Meta:
+        """Khai báo metadata cho `Color`, gồm: db_table."""
         db_table = 'color'
 
 class ProductVariant(models.Model):
+    """Model `ProductVariant` của domain `product`, biểu diễn biến thể sản phẩm theo size/màu, gồm SKU, tồn kho, ảnh và trọng lượng.. Thành phần chính: product, size, color, sku, stock, image_url, weight_grams, is_active, created_at, updated_at."""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="variants")
     size = models.ForeignKey(Size, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Size")
     color = models.ForeignKey(Color, on_delete=models.CASCADE, blank=True, null=True, verbose_name="Color")
@@ -173,7 +192,9 @@ class ProductVariant(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(default=None, blank=True, null=True, verbose_name="Updated At")
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return f"{self.product.name} - {self.size.name if self.size else 'N/A'} - {self.color.name if self.color else 'N/A'}"
 
     class Meta:
+        """Khai báo metadata cho `ProductVariant`, gồm: db_table."""
         db_table = 'product_variant'

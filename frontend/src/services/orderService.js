@@ -58,6 +58,14 @@ const orderService = {
       throw error;
     }
   },
+  confirmDelivery: async (orderId) => {
+    try {
+      const response = await apiClient.post(`/orders/${orderId}/confirm-delivery/`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
   createTemporaryOrder: async (listCartItemIds, couponIds = []) => {
     try {
       const response = await apiClient.post("/orders/temporary/", {

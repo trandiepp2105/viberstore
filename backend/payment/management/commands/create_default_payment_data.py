@@ -5,9 +5,11 @@ from django.core.files import File
 import os
 
 class Command(BaseCommand):
+    """Tạo các payment method và payment status mặc định cho hệ thống thanh toán."""
     help = "Create default payment statuses and methods"
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         # Create default payment statuses
         statuses = [
             {"code": "PENDING", "name": "Pending", "description": "Payment is pending."},

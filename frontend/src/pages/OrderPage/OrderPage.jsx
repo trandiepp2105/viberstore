@@ -16,14 +16,10 @@ const OrderPage = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
   const [isOpenCancelOrderPopup, setIsOpenCancelOrderPopup] = useState(false);
-  const [isOpenDeleteOrderPopup, setIsOpenDeleteOrderPopup] = useState(false);
   const handleToggleCancelOrderPopup = () => {
     setIsOpenCancelOrderPopup(!isOpenCancelOrderPopup);
   };
 
-  const handleToggleDeleteOrderPopup = () => {
-    setIsOpenDeleteOrderPopup(!isOpenDeleteOrderPopup);
-  };
   const location = useLocation();
   const currentType = new URLSearchParams(location.search).get("type");
 
@@ -72,18 +68,6 @@ const OrderPage = () => {
     }
   };
 
-  const handleDeleteOrder = async (orderId) => {
-    try {
-      await orderService.deleteOrder(orderId);
-      toast.success("Order deleted successfully!");
-      // Optionally, refresh the orders after deletion
-      getOrders();
-    } catch (error) {
-      console.error("Failed to delete order:", error);
-      toast.error("Failed to delete order. Please try again.");
-    }
-  };
-
   const [isOpenProcessOrderPopup, setIsOpenProcessOrderPopup] = useState(false);
 
   const handleToggleProcessOrderPopup = () => {
@@ -92,8 +76,8 @@ const OrderPage = () => {
 
   const handleConfirmProcessOrder = async () => {
     try {
-      await orderService.processOrder(selectedOrder.id);
-      toast.success("Process order successfully");
+      await orderService.confirmDelivery(selectedOrder.id);
+      toast.success("Delivery confirmed successfully");
       const deliveredStatus = orderStatuses.find(
         (status) => status.status_code === "DELIVERED"
       );
@@ -103,8 +87,8 @@ const OrderPage = () => {
       navigate("/account/order?type=Delivered");
       // fetchOrderDetail();
     } catch (error) {
-      console.error("Error deleting order:", error);
-      toast.error("Error deleting order");
+      console.error("Error confirming delivery:", error);
+      toast.error("Could not confirm delivery. Please try again.");
     }
   };
 
@@ -129,17 +113,6 @@ const OrderPage = () => {
           }}
         />
       )}
-      {isOpenDeleteOrderPopup && (
-        <AcceptancePopup
-          handleClose={handleToggleDeleteOrderPopup}
-          description="Are you sure you want to delete this order?"
-          handleAccept={() => {
-            handleDeleteOrder(selectedOrder.id);
-            handleToggleDeleteOrderPopup();
-          }}
-        />
-      )}
-
       {isOpenProcessOrderPopup && (
         <AcceptancePopup
           handleClose={handleToggleProcessOrderPopup}
@@ -209,7 +182,6 @@ const OrderPage = () => {
               orderStatuses={orderStatuses}
               setSelectedOrder={setSelectedOrder}
               handleToggleCancelOrderPopup={handleToggleCancelOrderPopup}
-              handleToggleDeleteOrderPopup={handleToggleDeleteOrderPopup}
               handleToggleProcessOrderPopup={handleToggleProcessOrderPopup}
             />
           ))

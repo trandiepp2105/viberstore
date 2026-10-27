@@ -7,6 +7,7 @@ class ReadOnly(permissions.BasePermission):
     SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
     def has_permission(self, request, view):
+        """Kiểm tra request có thỏa điều kiện permission của resource hay không."""
         return request.method in self.SAFE_METHODS
     
 
@@ -16,4 +17,5 @@ class IsAdminUser(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
+        """Kiểm tra request có thỏa điều kiện permission của resource hay không."""
         return bool(request.user and request.user.is_authenticated and request.user.is_staff)

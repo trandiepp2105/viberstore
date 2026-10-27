@@ -6,6 +6,7 @@ from .enums import RoleEnum
 
 @receiver(post_save, sender=User)
 def assign_default_role(sender, instance, created, **kwargs):
+    """Tự động gán role mặc định cho user vừa được tạo."""
     if created:
         # Tạo hoặc lấy role Customer từ Enum
         customer_role, _ = Role.objects.get_or_create(name=RoleEnum.CUSTOMER.value)

@@ -4,9 +4,11 @@ from django.db import transaction
 
 
 class Command(BaseCommand):
+    """Tạo hoặc nạp danh mục sản phẩm vào database từ tham số của command."""
     help = "Add parent and child categories to the database"
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         # Danh sách các category cha và con
         categories = {
             "LAPTOP": [

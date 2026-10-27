@@ -6,6 +6,7 @@ from django.db import transaction, models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from rest_framework.exceptions import PermissionDenied
 from user.models import User
 
 # import query set
@@ -31,6 +32,7 @@ User = get_user_model()
 
 # --- Helper: Get Initial/Default Statuses ---
 def get_initial_order_status() -> Optional[OrderStatus]:
+    """Thực hiện use case `get_initial_order_status` của `order` trong domain `order`, nhận dữ liệu theo ngữ cảnh và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
     # Define your logic to get the first status (e.g., 'PENDING', 'WAITING_PAYMENT')
     try:
         # Make sure you have seeded these statuses in your DB
@@ -40,6 +42,7 @@ def get_initial_order_status() -> Optional[OrderStatus]:
         return None
 
 def get_standard_shipping_method() -> Optional[ShippingMethod]:
+    """Thực hiện use case `get_standard_shipping_method` của `order` trong domain `order`, nhận dữ liệu theo ngữ cảnh và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
     # Define your logic to get the default shipping method (e.g., 'Standard', 'Express')
     try:
         return ShippingMethod.objects.get(method_code__iexact='STANDARD') # Example code
@@ -48,6 +51,7 @@ def get_standard_shipping_method() -> Optional[ShippingMethod]:
         return None
 # --- Order History Service ---
 class OrderHistoryService:
+    """Service `OrderHistoryService` của domain `order`, chịu trách nhiệm ghi nhận và truy vấn lịch sử trạng thái order.. Các method: add_entry()."""
     @staticmethod
     def add_entry(order: Order, status: OrderStatus, staff_user: Optional[User] = None, note: Optional[str] = None):
         """Adds a new entry to the order history."""
@@ -67,6 +71,7 @@ class OrderHistoryService:
 
 # --- Order Service ---
 class OrderService:
+    """Service `OrderService` của domain `order`, chịu trách nhiệm điều phối tạo và xử lý vòng đời order, liên kết cart, address, coupon, payment và stock.. Các method: _generate_order_code(), create_order_from_cart(), list_orders_for_user(), list_all_orders(), get_order_detail(), update_order_status(), process_order(), cancel_order(), delete_order()."""
 
     @staticmethod
     def _generate_order_code() -> str:
@@ -297,8 +302,10 @@ class OrderService:
     @transaction.atomic
     def update_order_status(order_id: int, new_status_code: str, staff_user: User, note: Optional[str] = None) -> Order:
         """Updates the order status (Admin action)."""
+        if not staff_user or not staff_user.is_authenticated or not staff_user.is_staff:
+            raise PermissionDenied("Only staff can change order status.")
         try:
-            order = Order.objects.select_related('current_status').get(pk=order_id)
+            order = Order.objects.select_for_update().select_related('current_status').get(pk=order_id)
         except ObjectDoesNotExist:
             raise ValueError(f"Order with ID {order_id} not found.")
 
@@ -335,12 +342,14 @@ class OrderService:
 
     @staticmethod
     @transaction.atomic
-    def process_order(order_id: int, staff_user: Optional[User] = None) -> Order:
+    def process_order(order_id: int, actor: User) -> Order:
         """
-        Processes the order to the next status in the sequence: PENDING -> PACKED -> DELIVERING -> DELIVERED.
+        Processes an order to its next status; only staff may perform this action.
         """
+        if not actor or not actor.is_authenticated or not actor.is_staff:
+            raise PermissionDenied("Only staff can process orders.")
         try:
-            order = Order.objects.select_related('current_status').get(pk=order_id)
+            order = Order.objects.select_for_update().select_related('current_status').get(pk=order_id)
         except ObjectDoesNotExist:
             raise ValueError(f"Order with ID {order_id} not found.")
 
@@ -363,7 +372,7 @@ class OrderService:
         OrderHistoryService.add_entry(
             order=order,
             status=next_status,
-            staff_user=staff_user,
+            staff_user=actor,
             note=f"Order processed to status '{next_status_code}'."
         )
 
@@ -371,17 +380,66 @@ class OrderService:
 
     @staticmethod
     @transaction.atomic
-    def cancel_order(order_id: int, staff_user: Optional[User] = None, reason: Optional[str] = None) -> Order:
-        """
-        Cancels the order and creates a CancelledOrder record.
-        """
+    def confirm_delivery(order_id: int, actor: User) -> Order:
+        """Allow the order owner to confirm receipt of an order in transit."""
+        if not actor or not actor.is_authenticated:
+            raise PermissionDenied("Authentication is required to confirm delivery.")
+        if actor.is_staff:
+            raise PermissionDenied("Staff must process delivery through the staff workflow.")
+
         try:
-            order = Order.objects.select_related('current_status').get(pk=order_id)
+            order = Order.objects.select_for_update().select_related('current_status').get(pk=order_id)
         except ObjectDoesNotExist:
             raise ValueError(f"Order with ID {order_id} not found.")
 
-        if order.current_status and order.current_status.status_code in ["DELIVERED", "CANCELLED"]:
+        if order.user_id != actor.pk:
+            raise PermissionDenied("You can only confirm delivery for your own orders.")
+
+        current_status_code = order.current_status.status_code if order.current_status else None
+        if current_status_code != "DELIVERING":
+            raise ValueError("Only orders in delivery can be confirmed as delivered.")
+
+        try:
+            delivered_status = OrderStatus.objects.get(status_code__iexact="DELIVERED")
+        except ObjectDoesNotExist:
+            raise RuntimeError("System configuration error: DELIVERED order status not found.")
+
+        order.current_status = delivered_status
+        order.save(update_fields=['current_status', 'updated_at'])
+        OrderHistoryService.add_entry(
+            order=order,
+            status=delivered_status,
+            staff_user=None,
+            note="Delivery confirmed by the customer.",
+        )
+        return order
+
+    @staticmethod
+    @transaction.atomic
+    def cancel_order(order_id: int, actor: User, reason: Optional[str] = None) -> Order:
+        """
+        Cancel an owned pending or packed order, or any cancellable order as staff.
+        """
+        if not actor or not actor.is_authenticated:
+            raise PermissionDenied("Authentication is required to cancel an order.")
+        try:
+            order = Order.objects.select_for_update().select_related('current_status').get(pk=order_id)
+        except ObjectDoesNotExist:
+            raise ValueError(f"Order with ID {order_id} not found.")
+
+        if not actor.is_staff and order.user_id != actor.pk:
+            raise PermissionDenied("You can only cancel your own orders.")
+
+        current_status_code = (
+            order.current_status.status_code if order.current_status else "PENDING"
+        )
+        if not actor.is_staff and current_status_code not in ("PENDING", "PACKED"):
+            raise PermissionDenied("Customers can only cancel pending or packed orders.")
+
+        if current_status_code in ["DELIVERED", "CANCELLED"]:
             raise ValueError(f"Order cannot be cancelled in its current status '{order.current_status.status_code}'.")
+
+        staff_user = actor if actor.is_staff else None
 
         cancelled_status = OrderStatus.objects.get(status_code="CANCELLED")
         order.current_status = cancelled_status
@@ -401,12 +459,14 @@ class OrderService:
 
     @staticmethod
     @transaction.atomic
-    def delete_order(order_id: int) -> bool:
+    def delete_order(order_id: int, actor: User) -> bool:
         """
-        Deletes the order and all related records.
+        Delete an order as staff; customers must use the cancellation flow.
         """
+        if not actor or not actor.is_authenticated or not actor.is_staff:
+            raise PermissionDenied("Only staff can delete orders.")
         try:
-            order = Order.objects.get(pk=order_id)
+            order = Order.objects.select_for_update().get(pk=order_id)
             order.delete()
 
             
@@ -421,12 +481,15 @@ class OrderService:
 
 # --- Delivery Info Service ---
 class DeliveryAddressService:
+    """Service `DeliveryAddressService` của domain `order`, chịu trách nhiệm CRUD địa chỉ và bảo đảm ownership/địa chỉ mặc định.. Các method: list_for_user(), get_by_id(), create_for_user(), update_for_user(), delete_for_user(), set_default()."""
     @staticmethod
     def list_for_user(user: User) -> QuerySet[DeliveryAddress]:
+        """Thực hiện use case `list_for_user` của `DeliveryAddressService` trong domain `order`, nhận user và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         return DeliveryAddress.objects.filter(user=user).order_by('-is_default', '-updated_at')
 
     @staticmethod
     def get_by_id(delivery_address_id: int, user: User) -> Optional[DeliveryAddress]:
+        """Thực hiện use case `get_by_id` của `DeliveryAddressService` trong domain `order`, nhận delivery_address_id, user và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try:
             return DeliveryAddress.objects.get(pk=delivery_address_id, user=user)
         except ObjectDoesNotExist:
@@ -435,6 +498,7 @@ class DeliveryAddressService:
     @staticmethod
     @transaction.atomic
     def create_for_user(user: User, data: Dict[str, Any]) -> DeliveryAddress:
+        """Thực hiện use case `create_for_user` của `DeliveryAddressService` trong domain `order`, nhận user, data và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         is_default = data.get('is_default', False)
         # Ensure only one default address
         if is_default:
@@ -454,6 +518,7 @@ class DeliveryAddressService:
     @staticmethod
     @transaction.atomic
     def update_for_user(delivery_address_id: int, user: User, data: Dict[str, Any]) -> DeliveryAddress:
+        """Thực hiện use case `update_for_user` của `DeliveryAddressService` trong domain `order`, nhận delivery_address_id, user, data và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try:
             info = DeliveryAddress.objects.get(pk=delivery_address_id, user=user)
         except ObjectDoesNotExist:
@@ -488,6 +553,7 @@ class DeliveryAddressService:
     @staticmethod
     @transaction.atomic
     def delete_for_user(delivery_address_id: int, user: User) -> bool:
+        """Thực hiện use case `delete_for_user` của `DeliveryAddressService` trong domain `order`, nhận delivery_address_id, user và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try:
             info = DeliveryAddress.objects.get(pk=delivery_address_id, user=user)
             # Add logic: Cannot delete the only address? Cannot delete default address?
@@ -541,23 +607,28 @@ class DeliveryAddressService:
 # These are typically simple CRUD managed by admins.
 
 class LookupService:
+    """Service `LookupService` của domain `order`, chịu trách nhiệm truy vấn các bảng lookup order/payment.. Các method: _list(), _get(), _create(), _update(), _delete(), list_order_statuses(), get_order_status(), list_shipping_methods(), get_shipping_method(), list_payment_methods(), get_payment_method()."""
     @staticmethod
     def _list(model_class: type[Model]):
+        """Thực hiện use case `_list` của `LookupService` trong domain `order`, nhận model_class và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         return model_class.objects.all().order_by('id')
 
     @staticmethod
     def _get(model_class: type[Model], pk: int):
+        """Thực hiện use case `_get` của `LookupService` trong domain `order`, nhận model_class, pk và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try: return model_class.objects.get(pk=pk)
         except ObjectDoesNotExist: return None
 
     @staticmethod
     def _create(model_class: type[Model], data: Dict[str, Any]):
+        """Thực hiện use case `_create` của `LookupService` trong domain `order`, nhận model_class, data và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         # Add validation if needed
         try: return model_class.objects.create(**data)
         except Exception as e: raise RuntimeError(f"Could not create {model_class.__name__}: {e}") from e
 
     @staticmethod
     def _update(model_class: type[Model], pk: int, data: Dict[str, Any]):
+        """Thực hiện use case `_update` của `LookupService` trong domain `order`, nhận model_class, pk, data và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         instance = LookupService._get(model_class, pk)
         if not instance: raise ValueError(f"{model_class.__name__} with ID {pk} not found.")
         has_changes = False
@@ -574,6 +645,7 @@ class LookupService:
 
     @staticmethod
     def _delete(model_class: type[Model], pk: int) -> bool:
+        """Thực hiện use case `_delete` của `LookupService` trong domain `order`, nhận model_class, pk và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         instance = LookupService._get(model_class, pk)
         if instance:
             try:
@@ -585,27 +657,41 @@ class LookupService:
 
     # --- Public methods for each lookup type ---
     @staticmethod
-    def list_order_statuses(): return LookupService._list(OrderStatus)
+    def list_order_statuses():
+        """Trả về danh sách trạng thái đơn hàng."""
+        return LookupService._list(OrderStatus)
+
     @staticmethod
-    def get_order_status(pk): return LookupService._get(OrderStatus, pk)
+    def get_order_status(pk):
+        """Lấy trạng thái đơn hàng theo khóa chính."""
+        return LookupService._get(OrderStatus, pk)
+
     # Add create/update/delete if needed for admin
 
     @staticmethod
     def list_shipping_methods(only_active=True):
+        """Thực hiện use case `list_shipping_methods` của `LookupService` trong domain `order`, nhận only_active và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         qs = ShippingMethod.objects.all()
         if only_active: qs = qs.filter(is_active=True)
         return qs.order_by('method_name')
     @staticmethod
-    def get_shipping_method(pk): return LookupService._get(ShippingMethod, pk)
+    def get_shipping_method(pk):
+        """Lấy phương thức giao hàng theo khóa chính."""
+        return LookupService._get(ShippingMethod, pk)
+
     # Add create/update/delete if needed
 
     @staticmethod
     def list_payment_methods(only_active=True):
+        """Thực hiện use case `list_payment_methods` của `LookupService` trong domain `order`, nhận only_active và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         qs = PaymentMethod.objects.all()
         if only_active: qs = qs.filter(is_active=True)
         return qs.order_by('method_name')
     @staticmethod
-    def get_payment_method(pk): return LookupService._get(PaymentMethod, pk)
+    def get_payment_method(pk):
+        """Lấy phương thức thanh toán theo khóa chính."""
+        return LookupService._get(PaymentMethod, pk)
+
     # Add create/update/delete if needed
 
     # Add similar methods for PaymentStatus, OrderReturnStatus if needed
@@ -614,9 +700,11 @@ class LookupService:
 # These would contain logic specific to those processes
 
 class CancellationService:
+     """Service `CancellationService` của domain `order`, chịu trách nhiệm kiểm tra điều kiện và hủy order.. Các method: cancel_order()."""
      @staticmethod
      @transaction.atomic
      def cancel_order(order_id: int, user_requesting: User, reason: Optional[str] = None) -> Order:
+         """Thực hiện use case `cancel_order` của `CancellationService` trong domain `order`, nhận order_id, user_requesting, reason và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
          # Fetch order
          # Check if cancellation is allowed (based on current status)
          # Check permissions (is user the owner or admin?)
@@ -627,9 +715,11 @@ class CancellationService:
          pass
 
 class ReturnService:
+     """Service `ReturnService` của domain `order`, chịu trách nhiệm tạo yêu cầu trả hàng và cập nhật trạng thái trả.. Các method: request_return(), update_return_status()."""
      @staticmethod
      @transaction.atomic
      def request_return(order_id: int, user: User, items_data: List[Dict], general_reason: Optional[str] = None) -> ReturnedOrder:
+          """Thực hiện use case `request_return` của `ReturnService` trong domain `order`, nhận order_id, user, items_data, general_reason và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
           # Fetch order, check ownership
           # Validate items_data (order_item_id, quantity, reason) against order items
           # Check if return is allowed (e.g., within return window, based on status)
@@ -643,6 +733,7 @@ class ReturnService:
      @staticmethod
      @transaction.atomic
      def update_return_status(return_id: int, new_status_code: str, staff_user: User, note: Optional[str]=None):
+          """Thực hiện use case `update_return_status` của `ReturnService` trong domain `order`, nhận return_id, new_status_code, staff_user, note và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
           # Fetch ReturnedOrder, new status
           # Check valid transition
           # Update ReturnedOrder status, processed_at if completed/refunded
@@ -653,6 +744,7 @@ class ReturnService:
 
 
 class ShippingMethodService:
+    """Service `ShippingMethodService` của domain `order`, chịu trách nhiệm quản lý phương thức vận chuyển.. Các method: list_shipping_methods(), get_shipping_method_by_id(), create_shipping_method(), update_shipping_method(), delete_shipping_method()."""
     @staticmethod
     def list_shipping_methods(only_active=True):
         """List all shipping methods, optionally filtering by active status."""
@@ -710,6 +802,7 @@ class ShippingMethodService:
 
 
 class DeliveryMethodService:
+    """Service `DeliveryMethodService` của domain `order`, chịu trách nhiệm cung cấp phương thức giao hàng cho quy trình order.. Các method: list_delivery_methods()."""
     @staticmethod
     def list_delivery_methods():
         """Retrieve all delivery methods."""

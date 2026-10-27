@@ -23,6 +23,7 @@ def convert_price_to_number(price_string):
 
 
 def search_series(product_name, series_list):
+    """Thực thi tác vụ quản trị/import dữ liệu với các tham số từ `manage.py`."""
     # Duyệt qua từng series trong danh sách
     for series in series_list:
         # Kiểm tra nếu product_name tồn tại trong danh sách sản phẩm của series
@@ -31,6 +32,7 @@ def search_series(product_name, series_list):
     return None  # Nếu không tìm thấy thì trả về None    
 
 def search_specification(product_id, specification_list):
+    """Thực thi tác vụ quản trị/import dữ liệu với các tham số từ `manage.py`."""
     # Duyệt qua từng specification trong danh sách
     for specification in specification_list:
         if product_id == specification["product_id"]:
@@ -38,6 +40,7 @@ def search_specification(product_id, specification_list):
     return None  
 
 def import_specification_data(specification_data, product):
+    """Thực thi tác vụ quản trị/import dữ liệu với các tham số từ `manage.py`."""
     for parent_name, sub_specifications in specification_data.items():
         parent_attribute, _ = Attribute.objects.get_or_create(name=parent_name, parent=None)
         for sub_specification in sub_specifications:
@@ -56,6 +59,7 @@ def import_specification_data(specification_data, product):
 
 
 def import_product_variant(variant_data, images_data, product):
+    """Thực thi tác vụ quản trị/import dữ liệu với các tham số từ `manage.py`."""
     for variant in variant_data:
         image_id = variant.get("image_id")
         price = variant.get("price")
@@ -85,6 +89,7 @@ def import_product_variant(variant_data, images_data, product):
         )
 
 def get_category_name(product_data):
+    """Thực thi tác vụ quản trị/import dữ liệu với các tham số từ `manage.py`."""
     category_reference = {
         "dong-ho-dinh-vi-tre-em": "WATCH_KIDS_SMARTWATCH",
         "dong-ho-do-huyet-ap": "WATCH_BLOOD_PRESSURE_MONITOR",
@@ -103,6 +108,7 @@ def get_category_name(product_data):
 
 
 def create_product_with_images(product_data, images_data, variant_data, specification_data, series_data):
+    """Thực thi tác vụ quản trị/import dữ liệu với các tham số từ `manage.py`."""
     try:
         with transaction.atomic():
 
@@ -148,6 +154,7 @@ def create_product_with_images(product_data, images_data, variant_data, specific
 
 
 class Command(BaseCommand):
+    """Import product, category, hình ảnh và các variant từ nguồn dữ liệu catalog."""
     help = 'Closes the specified poll for voting'
     # def handle(self, *args, **options):
     #     ProductImage.objects.all().delete()
@@ -160,6 +167,7 @@ class Command(BaseCommand):
     #     self.stdout.write(self.style.SUCCESS(f'All data deleted!'))
 
     def handle(self, *args, **options):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         count_success = 0
         product_data = pd.read_csv("./ProductLink/products.csv")
         images_data = pd.read_csv("./ProductLink/images.csv")
@@ -189,4 +197,3 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f'Row {index} failed to load!'))
                 print(f"Error: {e}")
         self.stdout.write(self.style.SUCCESS(f'{count_success} successfully loaded!'))
-

@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class ReviewService:
+    """Service `ReviewService` của domain `feedback`, chịu trách nhiệm tạo, đọc, cập nhật, xóa review và kiểm tra quyền theo user/order.. Các method: _validate_review_permission(), create_review(), update_review(), update_review_status(), delete_review(), get_review_by_id(), list_reviews()."""
 
     @staticmethod
     def _validate_review_permission(user: User, product: Product, order: Order):

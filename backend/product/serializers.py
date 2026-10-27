@@ -7,8 +7,10 @@ from product.utils import convert_image_to_jpeg
 
 
 class SupplierSerializer(serializers.ModelSerializer):
+    """Serializer `SupplierSerializer` của domain `product`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: cấu hình field/Meta."""
 
     class Meta:
+        """Khai báo metadata cho `SupplierSerializer`, gồm: model, fields, read_only_fields."""
         model = Supplier
         fields = [
             'id', 'company_name', 'slug', 'contact_person', 'email',
@@ -18,13 +20,17 @@ class SupplierSerializer(serializers.ModelSerializer):
         read_only_fields = ('id','slug')
 
 class SizeSerializer(serializers.ModelSerializer):
+    """Serializer `SizeSerializer` của domain `product`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: cấu hình field/Meta."""
     class Meta:
+        """Khai báo metadata cho `SizeSerializer`, gồm: model, fields, read_only_fields."""
         model = Size
         fields = ['id', 'name', 'description']
         read_only_fields = ('id',)
 
 class ColorSerializer(serializers.ModelSerializer):
+    """Serializer `ColorSerializer` của domain `product`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: cấu hình field/Meta."""
     class Meta:
+        """Khai báo metadata cho `ColorSerializer`, gồm: model, fields, read_only_fields."""
         model = Color
         fields = ['id', 'name', 'hex_code', 'description']
         read_only_fields = ('id',)
@@ -34,6 +40,7 @@ class BaseCategorySerializer(serializers.ModelSerializer):
     Chỉ dùng cho các trường đơn giản và không có lồng nhau.
     """
     class Meta:
+        """Khai báo metadata cho `BaseCategorySerializer`, gồm: model, fields, read_only_fields."""
         model = Category
         fields = [
             'id',
@@ -53,6 +60,7 @@ class RecursiveCategorySerializer(serializers.ModelSerializer):
     subcategories = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
+        """Khai báo metadata cho `RecursiveCategorySerializer`, gồm: model, fields, read_only_fields."""
         model = Category
         fields = [
             'id',
@@ -77,6 +85,7 @@ CategorySerializer = RecursiveCategorySerializer
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    """Serializer `ProductSerializer` của domain `product`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: supplier_details, supplier, category_id, stock, validate_image_url(), get_stock()."""
     supplier_details = SupplierSerializer(source='supplier', read_only=True)
     supplier = serializers.PrimaryKeyRelatedField(
         queryset=Supplier.objects.all(),
@@ -86,6 +95,7 @@ class ProductSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
+        """Khai báo metadata cho `ProductSerializer`, gồm: model, fields, read_only_fields."""
         model = Product
         fields = [
             'id',
@@ -111,6 +121,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'stock',
         )
     def validate_image_url(self, value):
+        """Xử lý `validate_image_url` của serializer `ProductSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         return convert_image_to_jpeg(value)
     def get_stock(self, obj):
         """
@@ -119,10 +130,12 @@ class ProductSerializer(serializers.ModelSerializer):
         return obj.variants.aggregate(total_stock=Sum('stock'))['total_stock'] or 0
 
 class ProductVariantSerializer(serializers.ModelSerializer):
+    """Serializer `ProductVariantSerializer` của domain `product`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: color_details, size_details, product_details."""
     color_details = ColorSerializer(source='color', read_only=True, allow_null=True)
     size_details = SizeSerializer(source='size', read_only=True, allow_null=True)
     product_details = ProductSerializer(source='product', read_only=True)
     class Meta:
+        """Khai báo metadata cho `ProductVariantSerializer`, gồm: model, fields, read_only_fields, validators."""
         model = ProductVariant
         fields = [
             'id',

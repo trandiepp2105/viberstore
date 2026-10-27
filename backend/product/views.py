@@ -57,6 +57,7 @@ class SupplierListCreateAPIView(APIView):
         tags=['Suppliers']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `SupplierListCreateAPIView` trong domain `product`, nhận request, format và trả response phù hợp."""
         try:
             filters = {
                 'status': request.query_params.get('status'),
@@ -82,6 +83,7 @@ class SupplierListCreateAPIView(APIView):
         tags=['Suppliers']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `SupplierListCreateAPIView` trong domain `product`, nhận request, format và trả response phù hợp."""
         serializer = SupplierSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
@@ -104,6 +106,7 @@ class SupplierDetailAPIView(APIView):
 
     permission_classes = [permissions.IsAdminUser]  # Chỉ cho phép admin truy cập
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         supplier = SupplierService.get_supplier_by_id(pk)
         if not supplier:
             raise Http404("Supplier not found.")
@@ -120,6 +123,7 @@ class SupplierDetailAPIView(APIView):
         tags=['Suppliers']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `SupplierDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             supplier = self._get_object(pk)
             serializer = SupplierSerializer(supplier, context={'request': request})
@@ -143,6 +147,7 @@ class SupplierDetailAPIView(APIView):
         tags=['Suppliers']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `SupplierDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             supplier = self._get_object(pk)
             serializer = SupplierSerializer(supplier, data=request.data, partial=False, context={'request': request})
@@ -177,6 +182,7 @@ class SupplierDetailAPIView(APIView):
         tags=['Suppliers']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `SupplierDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             supplier = self._get_object(pk)
             serializer = SupplierSerializer(supplier, data=request.data, partial=True, context={'request': request})
@@ -209,6 +215,7 @@ class SupplierDetailAPIView(APIView):
         tags=['Suppliers']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `SupplierDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             success = SupplierService.delete_supplier(pk)
             if success:
@@ -259,6 +266,7 @@ class CategoryListCreateAPIView(APIView):
         tags=['Categories']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `CategoryListCreateAPIView` trong domain `product`, nhận request, format và trả response phù hợp."""
         try:
             filters = {
                 'parent_id': request.query_params.get('parent'),
@@ -300,6 +308,7 @@ class CategoryListCreateAPIView(APIView):
         tags=['Categories']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `CategoryListCreateAPIView` trong domain `product`, nhận request, format và trả response phù hợp."""
         serializer = CategorySerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
@@ -336,6 +345,7 @@ class CategoryDetailAPIView(APIView):
         return [permission() for permission in permission_classes]
 
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         category = CategoryService.get_category_by_id(pk)
         if category is None:
             raise Http404("Category not found.")
@@ -352,6 +362,7 @@ class CategoryDetailAPIView(APIView):
         tags=['Categories']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `CategoryDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             category = self._get_object(pk)
             serializer = CategorySerializer(category, context={'request': request})
@@ -384,6 +395,7 @@ class CategoryDetailAPIView(APIView):
         tags=['Categories']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `CategoryDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             category = self._get_object(pk)
             serializer = CategorySerializer(category, data=request.data, partial=False, context={'request': request})
@@ -431,6 +443,7 @@ class CategoryDetailAPIView(APIView):
         tags=['Categories']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `CategoryDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             category = self._get_object(pk)
             serializer = CategorySerializer(category, data=request.data, partial=True, context={'request': request})
@@ -468,6 +481,7 @@ class CategoryDetailAPIView(APIView):
         tags=['Categories']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `CategoryDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             success = CategoryService.delete_category(pk)
             if success:
@@ -518,6 +532,7 @@ class ProductListCreateAPIView(APIView):
         tags=['Products']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `ProductListCreateAPIView` trong domain `product`, nhận request, format và trả response phù hợp."""
         try:
             filters = {
                 'category_id': request.query_params.get('category'),
@@ -582,6 +597,7 @@ class ProductListCreateAPIView(APIView):
         tags=['Products']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `ProductListCreateAPIView` trong domain `product`, nhận request, format và trả response phù hợp."""
         serializer = ProductSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -620,6 +636,7 @@ class ProductDetailAPIView(APIView):
 
         return [permission() for permission in permission_classes]
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         product = ProductService.get_product_by_id(pk)
         if product is None:
             raise Http404("Product not found.")
@@ -636,6 +653,7 @@ class ProductDetailAPIView(APIView):
         tags=['Products']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `ProductDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             product = self._get_object(pk)
             serializer = ProductSerializer(product, context={'request': request})
@@ -675,6 +693,7 @@ class ProductDetailAPIView(APIView):
         tags=['Products']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `ProductDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         return self._handle_update(request, pk, partial=False)
 
     @swagger_auto_schema(
@@ -704,11 +723,13 @@ class ProductDetailAPIView(APIView):
         tags=['Products']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `ProductDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         print("request data: ", request.data)
         return self._handle_update(request, pk, partial=True)
 
     # --- Logic chung cho PUT/PATCH ---
     def _handle_update(self, request, pk, partial):
+        """Xử lý dữ liệu cập nhật và trả về kết quả tương ứng."""
         try:
             product = ProductService.get_product_by_id(pk)
             if not product:
@@ -741,6 +762,7 @@ class ProductDetailAPIView(APIView):
         tags=['Products']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `ProductDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             success = ProductService.delete_product(pk)
             if success:
@@ -770,6 +792,7 @@ class ProductDetailBySlugAPIView(APIView):
         tags=['Products']
     )
     def get(self, request, slug, format=None):
+        """Xử lý HTTP `GET` của API view `ProductDetailBySlugAPIView` trong domain `product`, nhận request, slug, format và trả response phù hợp."""
         try:
             product = ProductService.get_product_by_slug(slug)
             if not product:
@@ -829,6 +852,7 @@ class ProductVariantListCreateAPIView(APIView):
         tags=['Product Variants']
     )
     def get(self, request, product_pk=None, format=None):
+        """Xử lý HTTP `GET` của API view `ProductVariantListCreateAPIView` trong domain `product`, nhận request, product_pk, format và trả response phù hợp."""
         try:
             product_filter_id = product_pk if product_pk else request.query_params.get('product')
             filters = {
@@ -890,6 +914,7 @@ class ProductVariantListCreateAPIView(APIView):
         tags=['Product Variants']
     )
     def post(self, request, product_pk=None, format=None):
+        """Xử lý HTTP `POST` của API view `ProductVariantListCreateAPIView` trong domain `product`, nhận request, product_pk, format và trả response phù hợp."""
         variant_data = {}
         if product_pk:
             variant_data['product'] = product_pk
@@ -933,6 +958,7 @@ class ProductVariantDetailAPIView(APIView):
 
         return [permission() for permission in permission_classes]
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         variant = ProductVariantService.get_variant_by_id(pk)
         if not variant:
             raise Http404("Product Variant not found.")
@@ -949,6 +975,7 @@ class ProductVariantDetailAPIView(APIView):
         tags=['Product Variants']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `ProductVariantDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             variant = self._get_object(pk)
             serializer = ProductVariantSerializer(variant, context={'request': request})
@@ -978,6 +1005,7 @@ class ProductVariantDetailAPIView(APIView):
         tags=['Product Variants']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `ProductVariantDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         return self._handle_update(request, pk, partial=False)
 
     @swagger_auto_schema(
@@ -998,9 +1026,11 @@ class ProductVariantDetailAPIView(APIView):
         tags=['Product Variants']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `ProductVariantDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         return self._handle_update(request, pk, partial=True)
 
     def _handle_update(self, request, pk, partial):
+        """Xử lý dữ liệu cập nhật và trả về kết quả tương ứng."""
         try:
             variant_data = request.data.copy()
             updated_variant = ProductVariantService.update_product_variant_with_attributes(pk, variant_data)
@@ -1027,6 +1057,7 @@ class ProductVariantDetailAPIView(APIView):
         tags=['Product Variants']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `ProductVariantDetailAPIView` trong domain `product`, nhận request, pk, format và trả response phù hợp."""
         try:
             success = ProductVariantService.delete_variant(pk)
             if success:
@@ -1056,6 +1087,7 @@ class ProductVariantsBySlugAPIView(APIView):
         tags=['Product Variants']
     )
     def get(self, request, slug, format=None):
+        """Xử lý HTTP `GET` của API view `ProductVariantsBySlugAPIView` trong domain `product`, nhận request, slug, format và trả response phù hợp."""
         try:
             variants = ProductVariantService.get_variants_by_product_slug(slug)
             if variants is None:
@@ -1071,6 +1103,7 @@ class ProductCategoriesAPIView(APIView):
     API view to retrieve categories of a specific product.
     """
     def get(self, request, product_pk, format=None):
+        """Xử lý HTTP `GET` của API view `ProductCategoriesAPIView` trong domain `product`, nhận request, product_pk, format và trả response phù hợp."""
         try:
             # Get top-level categories for the product
             categories = Category.objects.filter(
@@ -1100,6 +1133,7 @@ class ProductCategoriesBySlugAPIView(APIView):
     API view to retrieve categories of a specific product by its slug.
     """
     def get(self, request, slug, format=None):
+        """Xử lý HTTP `GET` của API view `ProductCategoriesBySlugAPIView` trong domain `product`, nhận request, slug, format và trả response phù hợp."""
         try:
             # Get top-level categories for the product
             categories = Category.objects.filter(

@@ -15,11 +15,30 @@ const RecoverPasswordPage = () => {
   const [recoverData, setRecoverData] = useState(initialRecoverData);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetToken, setResetToken] = useState("");
   const [otp, setOtp] = useState(new Array(6).fill(null));
   const inputRefs = useRef([]);
   const [step, setStep] = useState(1);
+  const showError = (error, fallback) => {
+    const responseData = error.response?.data;
+    const fieldError =
+      responseData?.new_password?.[0] ||
+      responseData?.reset_token?.[0] ||
+      responseData?.otp?.[0];
+    const message = responseData?.detail || fieldError || fallback;
+    addTemporaryComponent(
+      <AlertPopup description={message} />,
+      2500
+    );
+  };
   const backToPreviousStep = () => {
     if (step > 1) {
+      if (step === 3) {
+        setResetToken("");
+        setOtp(new Array(6).fill(null));
+        setStep(1);
+        return;
+      }
       setStep(step - 1);
     }
   };
@@ -35,25 +54,36 @@ const RecoverPasswordPage = () => {
         setStep(2);
       } catch (error) {
         console.error("Error while sending email", error);
+        showError(error, "Không thể gửi mã xác minh. Vui lòng thử lại.");
       } finally {
         setOnLoading(false);
       }
     } else if (step === 2) {
       // Call API to verify OTP
       const otpCode = otp.join("");
-      console.log("OTP code", otpCode);
       try {
-        await userService.verifyResetPasswordOTP(recoverData.email, otpCode);
+        const verifiedResetToken = await userService.verifyResetPasswordOTP(
+          recoverData.email,
+          otpCode
+        );
+        if (!verifiedResetToken) {
+          throw new Error("Không nhận được mã đặt lại mật khẩu.");
+        }
+        setResetToken(verifiedResetToken);
         setStep(3);
       } catch (error) {
         console.error("Error while verifying OTP", error);
+        showError(error, "Mã xác minh không hợp lệ hoặc đã hết hạn.");
       } finally {
         setOnLoading(false);
       }
     } else if (step === 3) {
       // Call API to change password
       try {
-        await userService.changePassword(recoverData.email, newPassword);
+        if (newPassword !== confirmPassword) {
+          throw new Error("Mật khẩu xác nhận không khớp.");
+        }
+        await userService.changePassword(resetToken, newPassword);
         addTemporaryComponent(
           <AlertPopup description="Bạn đã đổi mật khẩu thành công. Vui lòng đăng nhập lại." />,
           1000
@@ -61,6 +91,7 @@ const RecoverPasswordPage = () => {
         navigate("/login");
       } catch (error) {
         console.error("Error while changing password", error);
+        showError(error, "Không thể đổi mật khẩu. Vui lòng kiểm tra lại thông tin.");
       } finally {
         setOnLoading(false);
       }

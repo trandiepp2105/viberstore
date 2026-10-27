@@ -47,6 +47,7 @@ def generate_sku(product_name, size_name, color_name):
     color_slug = slugify(color_name)[:5].upper() if color_name else "NOCOLOR"
     return f"{product_slug}-{size_slug}-{color_slug}"
 class ProductVariantService:
+    """Service `ProductVariantService` của domain `product`, chịu trách nhiệm CRUD variant, sinh SKU và xử lý size/color/stock.. Các method: create_product_variant_with_attributes(), get_or_create_size(), get_or_create_color()."""
 
     @staticmethod
     @transaction.atomic
@@ -186,6 +187,7 @@ class ProductVariantService:
 # --- Supplier Services ---
 
 class SupplierService:
+    """Service `SupplierService` của domain `product`, chịu trách nhiệm CRUD, lọc và sinh slug cho supplier.. Các method: create_supplier(), update_supplier(), get_supplier_by_id(), list_suppliers(), delete_supplier()."""
     @staticmethod
     @transaction.atomic
     def create_supplier(data: Dict[str, Any]) -> Supplier:
@@ -256,6 +258,7 @@ class SupplierService:
 
 # --- Category Services ---
 class CategoryService:
+    """Service `CategoryService` của domain `product`, chịu trách nhiệm CRUD category, cây category và quan hệ product-category.. Các method: create_category(), update_category(), get_category_by_id(), list_categories(), delete_category(), _get_all_category_ids_from_nested_dict(), assign_product_categories()."""
 
     @staticmethod
     @transaction.atomic
@@ -463,6 +466,7 @@ class CategoryService:
 # --- Product Services ---
 
 class ProductService:
+    """Service `ProductService` của domain `product`, chịu trách nhiệm CRUD, lọc catalog, xử lý giá/ảnh và trạng thái publish của product.. Các method: update_product_with_nested_categories(), _get_all_category_ids_from_nested_dict(), assign_product_categories(), get_product_by_id(), list_products(), create_product(), delete_product(), get_product_by_slug()."""
     @staticmethod
     def update_product_with_nested_categories(product_id: int, data: Dict[str, Any], nested_categories: Optional[Dict] = None) -> Product:
         """
@@ -612,6 +616,7 @@ class ProductService:
 # --- Product Variant Services ---
 
 class ProductVariantService:
+    """Service `ProductVariantService` của domain `product`, chịu trách nhiệm CRUD variant, sinh SKU và xử lý size/color/stock.. Các method: create_variant(), update_variant(), get_variant_by_id(), list_variants(), delete_variant(), list_variants_for_product(), create_product_variant_with_attributes(), update_product_variant_with_attributes(), get_variants_by_product_slug()."""
     @staticmethod
     @transaction.atomic
     def create_variant(data: Dict[str, Any]) -> ProductVariant:

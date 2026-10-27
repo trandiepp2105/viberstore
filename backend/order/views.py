@@ -86,6 +86,7 @@ class OrderListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `OrderListCreateAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         try:
             orders = self.get_queryset(request)
             serializer = OrderSerializer(orders, many=True, context={'request': request})
@@ -108,6 +109,7 @@ class OrderListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `OrderListCreateAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         # Validate input using OrderCreateSerializer
         create_data = {
             "user": request.user,
@@ -176,6 +178,7 @@ class OrderDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `OrderDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
             order = self._get_object(pk, request.user)
             serializer = OrderSerializer(order, context={'request': request})
@@ -208,6 +211,7 @@ class OrderDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders (Admin Actions)']
     )
     def patch(self, request, pk, format=None): # Use PATCH for partial update (status)
+        """Xử lý HTTP `PATCH` của API view `OrderDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         # Check if user is admin first
         if not request.user.is_staff:
             return Response({"error": "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
@@ -248,10 +252,13 @@ class OrderDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def post(self, request, pk, format=None):
+        """Xử lý HTTP `POST` của API view `OrderDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
-            order = OrderService.process_order(order_id=pk, staff_user=request.user)
-            serializer = OrderSerializer(order, context={'request': request})
-            return Response(serializer.data)
+             order = OrderService.process_order(order_id=pk, actor=request.user)
+             serializer = OrderSerializer(order, context={'request': request})
+             return Response(serializer.data)
+        except PermissionDenied as e:
+            return Response({"error": str(e.detail)}, status=status.HTTP_403_FORBIDDEN)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -276,12 +283,15 @@ class OrderDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `OrderDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
-            success = OrderService.delete_order(order_id=pk)
+            success = OrderService.delete_order(order_id=pk, actor=request.user)
             if success:
                 return Response({"message": "Order deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied as e:
+            return Response({"error": str(e.detail)}, status=status.HTTP_403_FORBIDDEN)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -305,12 +315,15 @@ class OrderDeleteAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `OrderDeleteAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
-            success = OrderService.delete_order(order_id=pk)
+            success = OrderService.delete_order(order_id=pk, actor=request.user)
             if success:
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied as e:
+            return Response({"error": str(e.detail)}, status=status.HTTP_403_FORBIDDEN)
         except Exception as e:
             logger.error(f"Error deleting order {pk}: {e}", exc_info=True)
             return Response({"error": "An internal server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -323,6 +336,7 @@ class OrderStatusListCreateAPIView(APIView):
     List order statuses (accessible to authenticated users) or create a new order status (admin only).
     """
     def get_permissions(self):
+        """Xác định danh sách permission áp dụng cho request hiện tại."""
         if self.request.method == 'GET':
             return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
@@ -334,6 +348,7 @@ class OrderStatusListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Lookups']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `OrderStatusListCreateAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         statuses = LookupService.list_order_statuses()
         serializer = self.serializer_class(statuses, many=True)
         return Response(serializer.data)
@@ -347,6 +362,7 @@ class OrderStatusListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Lookups (Admin)']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `OrderStatusListCreateAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
@@ -362,6 +378,7 @@ class OrderStatusDetailAPIView(APIView):
     Retrieve order status details (accessible to authenticated users) or perform other actions (admin only).
     """
     def get_permissions(self):
+        """Xác định danh sách permission áp dụng cho request hiện tại."""
         if self.request.method == 'GET':
             return [permissions.IsAuthenticated()]
         return [permissions.IsAdminUser()]
@@ -369,6 +386,7 @@ class OrderStatusDetailAPIView(APIView):
     serializer_class = OrderStatusSerializer
 
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         instance = LookupService.get_order_status(pk)
         if not instance:
             raise Http404
@@ -382,6 +400,7 @@ class OrderStatusDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Lookups']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `OrderStatusDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         instance = self._get_object(pk)
         serializer = self.serializer_class(instance)
         return Response(serializer.data)
@@ -396,6 +415,7 @@ class OrderStatusDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Lookups (Admin)']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `OrderStatusDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         instance = self._get_object(pk)
         serializer = self.serializer_class(instance, data=request.data, partial=False)
         if serializer.is_valid():
@@ -416,6 +436,7 @@ class OrderStatusDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Lookups (Admin)']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `OrderStatusDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         instance = self._get_object(pk)
         serializer = self.serializer_class(instance, data=request.data, partial=True)
         if serializer.is_valid():
@@ -435,6 +456,7 @@ class OrderStatusDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Lookups (Admin)']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `OrderStatusDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
             if LookupService._delete(OrderStatus, pk):
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -481,6 +503,7 @@ class TemporaryOrderAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `TemporaryOrderAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         try:
             # Extract input data
             cart_item_ids = request.data.get('cart_item_ids', [])
@@ -546,6 +569,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class ShippingMethodListCreateAPIView(APIView):
+    """API view `ShippingMethodListCreateAPIView` của domain `order`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: get(), post()."""
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -557,6 +581,7 @@ class ShippingMethodListCreateAPIView(APIView):
         tags=['Shipping Methods']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `ShippingMethodListCreateAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         try:
             only_active = request.query_params.get('only_active', 'true').lower() in ['true', '1']
             methods = ShippingMethodService.list_shipping_methods(only_active=only_active)
@@ -576,6 +601,7 @@ class ShippingMethodListCreateAPIView(APIView):
         tags=['Shipping Methods']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `ShippingMethodListCreateAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         serializer = ShippingMethodSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -589,6 +615,7 @@ class ShippingMethodListCreateAPIView(APIView):
 
 
 class ShippingMethodDetailAPIView(APIView):
+    """API view `ShippingMethodDetailAPIView` của domain `order`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: get(), put(), delete()."""
     permission_classes = [permissions.IsAdminUser]
 
     @swagger_auto_schema(
@@ -601,6 +628,7 @@ class ShippingMethodDetailAPIView(APIView):
         tags=['Shipping Methods']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `ShippingMethodDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         method = ShippingMethodService.get_shipping_method_by_id(pk)
         if not method:
             return Response({"error": "Shipping method not found."}, status=status.HTTP_404_NOT_FOUND)
@@ -619,6 +647,7 @@ class ShippingMethodDetailAPIView(APIView):
         tags=['Shipping Methods']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `ShippingMethodDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         serializer = ShippingMethodSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -642,6 +671,7 @@ class ShippingMethodDetailAPIView(APIView):
         tags=['Shipping Methods']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `ShippingMethodDetailAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         success = ShippingMethodService.delete_shipping_method(pk)
         if success:
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -677,6 +707,7 @@ class DeliveryMethodListAPIView(APIView):
         tags=["Delivery Methods"]
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `DeliveryMethodListAPIView` trong domain `order`, nhận request, format và trả response phù hợp."""
         methods = DeliveryMethodService.list_delivery_methods()
         data = [{"id": method.id, "name": method.name, "description": method.description, "code": method.code} for method in methods]
         return Response(data, status=status.HTTP_200_OK)
@@ -705,11 +736,14 @@ class CancelOrderAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def post(self, request, pk, format=None):
+        """Xử lý HTTP `POST` của API view `CancelOrderAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         reason = request.data.get('reason', None)
         try:
-            order = OrderService.cancel_order(order_id=pk, staff_user=request.user if request.user.is_staff else None, reason=reason)
+            order = OrderService.cancel_order(order_id=pk, actor=request.user, reason=reason)
             serializer = OrderSerializer(order, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
+        except PermissionDenied as e:
+            return Response({"error": str(e.detail)}, status=status.HTTP_403_FORBIDDEN)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -721,7 +755,7 @@ class ProcessOrderAPIView(APIView):
     """
     Process an order to the next status in the sequence.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAdminUser]
 
     @swagger_auto_schema(
         operation_summary="Process Order",
@@ -735,17 +769,47 @@ class ProcessOrderAPIView(APIView):
         security=[{'Bearer': []}], tags=['Orders']
     )
     def post(self, request, pk, format=None):
+        """Xử lý HTTP `POST` của API view `ProcessOrderAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
-            staff_user = None
-            if request.user.is_staff:
-                staff_user = request.user
-            order = OrderService.process_order(order_id=pk, staff_user=staff_user)
+            order = OrderService.process_order(order_id=pk, actor=request.user)
             serializer = OrderSerializer(order, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
+        except PermissionDenied as e:
+            return Response({"error": str(e.detail)}, status=status.HTTP_403_FORBIDDEN)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(f"Error processing order {pk}: {e}", exc_info=True)
+            return Response({"error": "An internal server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ConfirmDeliveryAPIView(APIView):
+    """Let a customer confirm receipt of their own order currently in delivery."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Confirm delivery",
+        operation_description="The owner of an order in DELIVERING status may confirm receipt and move it to DELIVERED.",
+        responses={
+            200: openapi.Response(description="Delivery confirmed", schema=OrderSerializer),
+            400: openapi.Response(description="Order is not in delivery"),
+            403: openapi.Response(description="Only the order owner may confirm delivery"),
+            404: openapi.Response(description="Order not found"),
+        },
+        security=[{'Bearer': []}], tags=['Orders']
+    )
+    def post(self, request, pk, format=None):
+        try:
+            order = OrderService.confirm_delivery(order_id=pk, actor=request.user)
+            serializer = OrderSerializer(order, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except PermissionDenied as e:
+            return Response({"error": str(e.detail)}, status=status.HTTP_403_FORBIDDEN)
+        except ValueError as e:
+            code = status.HTTP_404_NOT_FOUND if "not found" in str(e).lower() else status.HTTP_400_BAD_REQUEST
+            return Response({"error": str(e)}, status=code)
+        except Exception as e:
+            logger.error(f"Error confirming delivery for order {pk}: {e}", exc_info=True)
             return Response({"error": "An internal server error occurred."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -756,6 +820,7 @@ class OrderHistoryAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `OrderHistoryAPIView` trong domain `order`, nhận request, pk, format và trả response phù hợp."""
         try:
             # Check if the user has access to the order
             if not request.user.is_staff:
@@ -779,4 +844,3 @@ class OrderHistoryAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": f"An internal server error occurred: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

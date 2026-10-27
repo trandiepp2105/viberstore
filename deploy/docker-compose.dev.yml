@@ -1,0 +1,102 @@
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: viberstore_dev_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/dev.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./certs/dev:/etc/nginx/certs:ro
+      - ../backend/media:/var/www/media:ro
+      - ../backend/static:/var/www/static:ro
+    environment:
+      NGINX_ENVSUBST_FILTER: "^$"
+    depends_on:
+      - frontend
+      - admin
+      - backend
+    networks: [devnet]
+
+  frontend:
+    container_name: viberstore_dev_frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    expose: ["80"]
+    networks:
+      devnet:
+        aliases: [viberstore_frontend]
+
+  admin:
+    container_name: viberstore_dev_admin
+    build:
+      context: ../admin
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_URL: /dashboard
+    expose: ["80"]
+    networks:
+      devnet:
+        aliases: [viberstore_admin]
+
+  backend:
+    container_name: viberstore_dev_backend
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    volumes:
+      - ../backend:/backend
+    expose: ["8000"]
+    env_file: ../.env
+    environment:
+      MYSQL_HOST: mysql
+      APP_HOST: localhost
+      APP_SCHEME: https
+      FRONTEND_ORIGIN: https://localhost
+      ADMIN_ORIGIN: https://localhost
+      DJANGO_SECURE_SSL_REDIRECT: "True"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      devnet:
+        aliases: [viberstore_backend]
+    stdin_open: true
+    tty: true
+
+  mysql:
+    image: mysql:8.0
+    container_name: viberstore_dev_mysql
+    ports:
+      - "3310:3309"
+    env_file: ../.env
+    command: ["--port=3309"]
+    volumes:
+      - dev-mysql:/var/lib/mysql
+      - ../initial_data:/docker-entrypoint-initdb.d
+      - ../mysql_custom_conf:/etc/mysql/conf.d
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /var/lib/mysql/initial_data_imported.flag"]
+      interval: 5s
+      timeout: 2s
+      retries: 72
+      start_period: 15s
+    networks: [devnet]
+
+  redis:
+    image: redis:latest
+    container_name: viberstore_dev_redis
+    expose: ["6379"]
+    command: ["redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - dev-redis:/data
+    networks: [devnet]
+
+volumes:
+  dev-mysql:
+  dev-redis:
+
+networks:
+  devnet:
+    driver: bridge

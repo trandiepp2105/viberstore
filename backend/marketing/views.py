@@ -57,6 +57,7 @@ class PromotionListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin)']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `PromotionListCreateAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         filters = {
             'is_active': request.query_params.get('is_active'),
             'type': request.query_params.get('type'),
@@ -83,6 +84,7 @@ class PromotionListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin)']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `PromotionListCreateAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         serializer = self.serializer_class(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
@@ -103,6 +105,7 @@ class PromotionDetailAPIView(APIView):
     serializer_class = PromotionSerializer
 
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         promo = PromotionService.get_promotion_by_id(pk)
         if not promo: raise Http404("Promotion not found.")
         return promo
@@ -117,6 +120,7 @@ class PromotionDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin)']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `PromotionDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         try:
             promo = self._get_object(pk)
             serializer = self.serializer_class(promo, context={'request': request})
@@ -136,6 +140,7 @@ class PromotionDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin)']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `PromotionDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         promo = self._get_object(pk) # Check existence
         serializer = self.serializer_class(promo, data=request.data, partial=False, context={'request': request})
         if serializer.is_valid():
@@ -161,6 +166,7 @@ class PromotionDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin)']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `PromotionDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         promo = self._get_object(pk)
         serializer = self.serializer_class(promo, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -184,6 +190,7 @@ class PromotionDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin)']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `PromotionDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         try:
             if PromotionService.delete_promotion(pk):
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -212,6 +219,7 @@ class PromotionAssignmentAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin Actions)']
     )
     def post(self, request, format=None): # Use POST for assignment action
+        """Xử lý HTTP `POST` của API view `PromotionAssignmentAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
@@ -238,6 +246,7 @@ class PromotionAssignmentAPIView(APIView):
         security=[{'Bearer': []}], tags=['Promotions (Admin Actions)']
     )
     def delete(self, request, format=None): # Use DELETE for removal action (or POST with specific action field)
+        """Xử lý HTTP `DELETE` của API view `PromotionAssignmentAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             try:
@@ -257,6 +266,7 @@ class CouponListCreateAPIView(APIView):
     """List coupons or create a new one."""
     serializer_class = CouponSerializer # Hint for swagger
     def get_permissions(self):
+        """Xác định danh sách permission áp dụng cho request hiện tại."""
         if self.request.method == "POST":
             return [permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
@@ -276,6 +286,7 @@ class CouponListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin)']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `CouponListCreateAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         filters = {
             'is_active': _parse_query_param_bool(request.query_params.get('is_active')),
             'code': request.query_params.get('code'),
@@ -300,6 +311,7 @@ class CouponListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin)']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `CouponListCreateAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         serializer = self.serializer_class(data=request.data, context={'request': request})
         if serializer.is_valid():
             try:
@@ -322,6 +334,7 @@ class CouponDetailAPIView(APIView):
     serializer_class = CouponSerializer
 
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         # Can use ID or code for detail view? Let's stick to PK for consistency.
         coupon = CouponService.get_coupon_by_id(pk)
         # Or: coupon = CouponService.get_coupon_by_code(code) if using code in URL
@@ -338,6 +351,7 @@ class CouponDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin)']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `CouponDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         try:
             coupon = self._get_object(pk)
             serializer = self.serializer_class(coupon, context={'request': request})
@@ -357,6 +371,7 @@ class CouponDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin)']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `CouponDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         coupon = self._get_object(pk)
         serializer = self.serializer_class(coupon, data=request.data, partial=False, context={'request': request})
         if serializer.is_valid():
@@ -382,6 +397,7 @@ class CouponDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin)']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `CouponDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         coupon = self._get_object(pk)
         serializer = self.serializer_class(coupon, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
@@ -405,6 +421,7 @@ class CouponDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin)']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `CouponDetailAPIView` trong domain `marketing`, nhận request, pk, format và trả response phù hợp."""
         try:
             if CouponService.delete_coupon(pk):
                 return Response(status=status.HTTP_204_NO_CONTENT)
@@ -429,6 +446,7 @@ class CouponValidateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (User Actions)']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `CouponValidateAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         serializer = CouponValidationRequestSerializer(data=request.data)
         if serializer.is_valid():
             code = serializer.validated_data['code']
@@ -474,6 +492,7 @@ class CouponUsageListAPIView(APIView):
         security=[{'Bearer': []}], tags=['Coupons (Admin Actions)']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `CouponUsageListAPIView` trong domain `marketing`, nhận request, format và trả response phù hợp."""
         filters = {
             'user_id': request.query_params.get('user_id'),
             'coupon_id': request.query_params.get('coupon_id'),

@@ -10,6 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class PaymentStatusListAPIView(APIView):
+    """API view `PaymentStatusListAPIView` của domain `payment`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: get()."""
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -22,6 +23,7 @@ class PaymentStatusListAPIView(APIView):
         tags=['Payment']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `PaymentStatusListAPIView` trong domain `payment`, nhận request, format và trả response phù hợp."""
         try:
             statuses = PaymentService.list_payment_statuses()
             serializer = PaymentStatusSerializer(statuses, many=True)
@@ -32,6 +34,7 @@ class PaymentStatusListAPIView(APIView):
 
 
 class PaymentMethodListAPIView(APIView):
+    """API view `PaymentMethodListAPIView` của domain `payment`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: get()."""
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
@@ -44,6 +47,7 @@ class PaymentMethodListAPIView(APIView):
         tags=['Payment Methods']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `PaymentMethodListAPIView` trong domain `payment`, nhận request, format và trả response phù hợp."""
         try:
             methods = PaymentService.list_payment_methods()
             serializer = PaymentMethodSerializer(methods, many=True, context={'request': request})
@@ -54,6 +58,7 @@ class PaymentMethodListAPIView(APIView):
 
 
 class PaymentListCreateAPIView(APIView):
+    """API view `PaymentListCreateAPIView` của domain `payment`, chịu trách nhiệm liệt kê hoặc tạo payment record.. HTTP methods: get(), post()."""
     permission_classes = [permissions.IsAuthenticated]
 
     @swagger_auto_schema(
@@ -72,6 +77,7 @@ class PaymentListCreateAPIView(APIView):
         tags=['Payments']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `PaymentListCreateAPIView` trong domain `payment`, nhận request, format và trả response phù hợp."""
         order_id = request.query_params.get('order_id')
         if not order_id:
             return Response({"error": "order_id is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -95,6 +101,7 @@ class PaymentListCreateAPIView(APIView):
         tags=['Payments']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `PaymentListCreateAPIView` trong domain `payment`, nhận request, format và trả response phù hợp."""
         serializer = PaymentSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -110,6 +117,7 @@ class PaymentListCreateAPIView(APIView):
 
 
 class ProcessPaymentAPIView(APIView):
+    """API view `ProcessPaymentAPIView` của domain `payment`, chịu trách nhiệm khởi tạo/xử lý payment qua service hoặc gateway.. HTTP methods: post()."""
     permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(
@@ -124,6 +132,7 @@ class ProcessPaymentAPIView(APIView):
         tags=['Payments']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `ProcessPaymentAPIView` trong domain `payment`, nhận request, format và trả response phù hợp."""
 
         try:
             payment = PaymentService.process_vnpay_response(request)

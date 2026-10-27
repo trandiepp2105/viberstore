@@ -4,6 +4,7 @@ from .models import Product
 
 @shared_task
 def publish_scheduled_products():
+    """Publish các product đã đến thời điểm được lên lịch."""
     now = timezone.now()
     products_to_publish = Product.objects.filter(
         is_published=False,

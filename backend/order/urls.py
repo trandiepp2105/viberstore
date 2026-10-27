@@ -9,6 +9,7 @@ urlpatterns = [
     path('orders/temporary/', views.TemporaryOrderAPIView.as_view(), name='temporary-order-list-create'),
     path('orders/<int:pk>/cancel/', views.CancelOrderAPIView.as_view(), name='order-cancel'),
     path('orders/<int:pk>/process/', views.ProcessOrderAPIView.as_view(), name='order-process'),
+    path('orders/<int:pk>/confirm-delivery/', views.ConfirmDeliveryAPIView.as_view(), name='order-confirm-delivery'),
     path('orders/<int:pk>/history/', views.OrderHistoryAPIView.as_view(), name='order-history'),
 
     # Lookup Table URLs (Admin Only)

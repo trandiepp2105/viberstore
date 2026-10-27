@@ -54,7 +54,7 @@ const userService = {
 
   sendResetPasswordEmail: async (email) => {
     try {
-      await apiClient.post("/auth/reset-password/?step=1", { email });
+      await apiClient.post("/auth/password-reset/request/", { email });
     } catch (error) {
       throw error;
     }
@@ -62,16 +62,20 @@ const userService = {
 
   verifyResetPasswordOTP: async (email, otp) => {
     try {
-      await apiClient.post("/auth/reset-password/?step=2", { email, otp });
+      const response = await apiClient.post("/auth/password-reset/verify/", {
+        email,
+        otp,
+      });
+      return response.data.reset_token;
     } catch (error) {
       throw error;
     }
   },
 
-  changePassword: async (email, newPassword) => {
+  changePassword: async (resetToken, newPassword) => {
     try {
-      await apiClient.post("/auth/reset-password/?step=3", {
-        email: email,
+      await apiClient.post("/auth/password-reset/complete/", {
+        reset_token: resetToken,
         new_password: newPassword,
       });
     } catch (error) {

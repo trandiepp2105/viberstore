@@ -30,6 +30,7 @@ class CartItemSerializer(serializers.ModelSerializer):
     available_variants = serializers.SerializerMethodField()
 
     class Meta:
+        """Khai báo metadata cho `CartItemSerializer`, gồm: model, fields, read_only_fields, extra_kwargs."""
         model = CartItem
         fields = [
             'id',

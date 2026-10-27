@@ -29,6 +29,7 @@ class ReviewListCreateAPIView(APIView):
     serializer_class = ReviewSerializer # Hint for swagger
 
     def get_permissions(self):
+        """Xác định danh sách permission áp dụng cho request hiện tại."""
         if self.request.method == 'POST':
              # Must be logged in to create a review
              return [permissions.IsAuthenticated()]
@@ -80,6 +81,7 @@ class ReviewListCreateAPIView(APIView):
         tags=['Reviews']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `ReviewListCreateAPIView` trong domain `feedback`, nhận request, format và trả response phù hợp."""
         try:
             filters = {
                 'product_id': request.query_params.get('product_id'),
@@ -127,6 +129,7 @@ class ReviewListCreateAPIView(APIView):
         security=[{'Bearer': []}], tags=['Reviews']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `ReviewListCreateAPIView` trong domain `feedback`, nhận request, format và trả response phù hợp."""
         # Permissions check done by get_permissions
         serializer = self.serializer_class(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -159,6 +162,7 @@ class ReviewDetailAPIView(APIView):
     serializer_class = ReviewSerializer
 
     def get_permissions(self):
+        """Xác định danh sách permission áp dụng cho request hiện tại."""
         # Allow read access based on status check within GET method
         if self.request.method == 'GET':
             return [permissions.AllowAny()]
@@ -166,6 +170,7 @@ class ReviewDetailAPIView(APIView):
         return [permissions.IsAuthenticated()]
 
     def _get_object(self, pk):
+        """Lấy đối tượng thuộc phạm vi xử lý của request hiện tại."""
         review = ReviewService.get_review_by_id(pk)
         if review is None:
             raise Http404("Review not found.")
@@ -200,6 +205,7 @@ class ReviewDetailAPIView(APIView):
         tags=['Reviews']
     )
     def get(self, request, pk, format=None):
+        """Xử lý HTTP `GET` của API view `ReviewDetailAPIView` trong domain `feedback`, nhận request, pk, format và trả response phù hợp."""
         try:
             review = self._get_object(pk)
             is_owner = request.user == review.user
@@ -256,6 +262,7 @@ class ReviewDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Reviews']
     )
     def put(self, request, pk, format=None): # Use PUT/PATCH for user updates
+        """Xử lý HTTP `PUT` của API view `ReviewDetailAPIView` trong domain `feedback`, nhận request, pk, format và trả response phù hợp."""
         try:
             # Service layer will check ownership inside update_review
             # Use serializer to validate rating/comment input format
@@ -295,6 +302,7 @@ class ReviewDetailAPIView(APIView):
 
     @swagger_auto_schema(auto_schema=None) # Hide PATCH if logic is same as PUT
     def patch(self, request, pk, format=None):
+         """Xử lý HTTP `PATCH` của API view `ReviewDetailAPIView` trong domain `feedback`, nhận request, pk, format và trả response phù hợp."""
          return self.put(request, pk, format)
 
     @swagger_auto_schema(
@@ -311,6 +319,7 @@ class ReviewDetailAPIView(APIView):
         security=[{'Bearer': []}], tags=['Reviews']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `ReviewDetailAPIView` trong domain `feedback`, nhận request, pk, format và trả response phù hợp."""
         try:
             # Service checks ownership or admin status
             success = ReviewService.delete_review(pk, request.user)
@@ -363,6 +372,7 @@ class AdminReviewUpdateStatusAPIView(APIView):
         security=[{'Bearer': []}], tags=['Reviews (Admin Actions)']
     )
     def patch(self, request, pk, format=None): # Use PATCH for status update
+        """Xử lý HTTP `PATCH` của API view `AdminReviewUpdateStatusAPIView` trong domain `feedback`, nhận request, pk, format và trả response phù hợp."""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             new_status = serializer.validated_data['status']

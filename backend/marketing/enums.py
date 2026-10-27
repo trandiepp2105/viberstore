@@ -2,6 +2,7 @@
 from enum import Enum
 
 class PromotionType(Enum):
+    """Các loại promotion gồm giảm theo phần trăm, giảm cố định và miễn phí vận chuyển."""
     PERCENTAGE = "percentage"
     FIXED = "fixed"
     FREE_SHIPPING = "free shipping"
@@ -9,4 +10,5 @@ class PromotionType(Enum):
 
     @classmethod
     def choices(cls):
+        """Chuyển enum thành danh sách choices tương thích với field Django."""
         return [(tag.value, tag.value) for tag in cls]  # Ensure the value is used for both key and display

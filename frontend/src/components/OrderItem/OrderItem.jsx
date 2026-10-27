@@ -1,13 +1,11 @@
 import React from "react";
 import "./OrderItem.scss";
 import formatCurrencyVN from "../../utils/formatCurrencyVN";
-import orderService from "../../services/orderService";
 const OrderItem = ({
   order,
   orderStatuses,
   setSelectedOrder,
   handleToggleCancelOrderPopup,
-  handleToggleDeleteOrderPopup,
   handleToggleProcessOrderPopup,
 }) => {
   const currentStatus = orderStatuses.find(
@@ -172,19 +170,6 @@ const OrderItem = ({
                 }}
               >
                 Mark as Delivered
-              </button>
-            </>
-          )}
-          {currentStatus?.status_code === "CANCELLED" && (
-            <>
-              <button
-                className="order-process-btn delete-order-btn main"
-                onClick={() => {
-                  setSelectedOrder(order);
-                  handleToggleDeleteOrderPopup();
-                }}
-              >
-                Delete
               </button>
             </>
           )}

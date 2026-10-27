@@ -24,11 +24,18 @@ APP_HOST = os.environ.get('APP_HOST', 'localhost').strip()
 APP_SCHEME = os.environ.get('APP_SCHEME', 'http').strip()
 APP_BASE_URL = f"{APP_SCHEME}://{APP_HOST}" if APP_HOST else None
 
+# Nginx terminates TLS and forwards the original scheme to Django.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SECURE_SSL_REDIRECT', 'False') == 'True'
+SESSION_COOKIE_SECURE = APP_SCHEME == 'https'
+CSRF_COOKIE_SECURE = APP_SCHEME == 'https'
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+
 # ==============================================================================
 # ORIGIN & ALLOWED HOSTS CONFIGURATION
 # ==============================================================================
-# FRONTEND_ORIGIN example: http://20.198.225.85
-# ADMIN_ORIGIN example: http://20.198.225.85:8088
+# FRONTEND_ORIGIN example: https://20.198.225.85
+# ADMIN_ORIGIN example: https://20.198.225.85
 FRONTEND_ORIGIN_CONFIG = os.environ.get('FRONTEND_ORIGIN') or APP_BASE_URL
 ADMIN_ORIGIN_CONFIG = os.environ.get('ADMIN_ORIGIN') or APP_BASE_URL
 
@@ -184,6 +191,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'password_reset_ip': '20/hour',
+        'password_reset_request_email': '3/hour',
+        'password_reset_verify_email': '10/hour',
+    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
 }

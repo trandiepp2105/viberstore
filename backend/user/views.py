@@ -3,23 +3,30 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from .serializers import UserSerializer
-from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework import status  # Import status codes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
 from .models import User
-from .security import create_access_token
 from datetime import timedelta
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.settings import api_settings
-from rest_framework.status import HTTP_404_NOT_FOUND, HTTP_401_UNAUTHORIZED
-from user.serializers import CustomTokenObtainPairSerializer, VerifyEmailSerializer, VerifyOTPSerializer, ResetPasswordSerializer
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
-from rest_framework_simplejwt.views import TokenRefreshView
-from user.email_conf import send_html_email, hash_email
-from django.core.cache import cache
+from rest_framework.status import HTTP_401_UNAUTHORIZED
+from user.serializers import (
+    CustomTokenObtainPairSerializer,
+    PasswordResetCompleteSerializer,
+    PasswordResetRequestSerializer,
+    PasswordResetVerifySerializer,
+    VerifyOTPSerializer,
+)
+from user.email_conf import send_html_email
+from .services import PasswordResetService
+from .throttling import (
+    PasswordResetIPThrottle,
+    PasswordResetRequestEmailThrottle,
+    PasswordResetVerifyEmailThrottle,
+)
 
 # logging info
 import logging
@@ -29,10 +36,12 @@ logger = logging.getLogger(__name__)
 
 
 class RegisterView(APIView):
+    """API view `RegisterView` của domain `user`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: post()."""
     permission_classes = []  # Không yêu cầu authentication cho register
     
     @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request):
+        """Xử lý HTTP `POST` của API view `RegisterView` trong domain `user`, nhận request và trả response phù hợp."""
         data = request.data
         email = data.get("email")
 
@@ -79,9 +88,11 @@ class RegisterView(APIView):
 
 
 class LoginView(TokenObtainPairView):
+    """API view `LoginView` của domain `user`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: post()."""
 
     serializer_class = CustomTokenObtainPairSerializer
     def post(self, request, *args, **kwargs):
+        """Xử lý HTTP `POST` của API view `LoginView` trong domain `user`, nhận request và trả response phù hợp."""
         response = super().post(request, *args, **kwargs)
         data = response.data
 
@@ -112,12 +123,14 @@ class LoginView(TokenObtainPairView):
         return response
 
 class LogoutView(APIView):
+    """API view `LogoutView` của domain `user`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: post()."""
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         responses={200: "Logout successful", 401: "Invalid token"}
     )
     def post(self, request):
+        """Xử lý HTTP `POST` của API view `LogoutView` trong domain `user`, nhận request và trả response phù hợp."""
         try:
             refresh_token = request.COOKIES.get('refresh')
             if not refresh_token:
@@ -176,6 +189,7 @@ class LogoutView(APIView):
             raise AuthenticationFailed('Invalid token')
 
 class RefreshTokenView(APIView):
+    """API view `RefreshTokenView` của domain `user`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: post()."""
     permission_classes = []
     @swagger_auto_schema(
         responses={
@@ -184,6 +198,7 @@ class RefreshTokenView(APIView):
         }
     )
     def post(self, request):
+        """Xử lý HTTP `POST` của API view `RefreshTokenView` trong domain `user`, nhận request và trả response phù hợp."""
         print("Refresh token request: ", request.COOKIES)
         logger.info(f"Refresh token request: {request.COOKIES}")
         try:
@@ -235,6 +250,7 @@ class RefreshTokenView(APIView):
             )
 
 class VerifyEmailOTPView(APIView):
+    """API view `VerifyEmailOTPView` của domain `user`, chịu trách nhiệm nhận request, gọi serializer/service và trả response. HTTP methods: post()."""
     @swagger_auto_schema(
         request_body=VerifyOTPSerializer,
         responses={
@@ -243,6 +259,7 @@ class VerifyEmailOTPView(APIView):
         }
     )
     def post(self, request):
+        """Xử lý HTTP `POST` của API view `VerifyEmailOTPView` trong domain `user`, nhận request và trả response phù hợp."""
         serializer = VerifyOTPSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data["email"]
@@ -251,79 +268,57 @@ class VerifyEmailOTPView(APIView):
             return Response({"message": "Xác thực OTP thành công."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class PasswordRessetView(APIView):
-    """
-    Gộp các bước gửi OTP, xác thực OTP và đặt lại mật khẩu vào một view với tham số `step`.
-    """
+class PasswordResetRequestView(APIView):
+    """Request a reset OTP without disclosing whether an account exists."""
+
+    permission_classes = []
+    throttle_classes = [PasswordResetIPThrottle, PasswordResetRequestEmailThrottle]
+
     def post(self, request):
-        step = request.query_params.get('step')
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        PasswordResetService.request_reset(serializer.validated_data["email"])
+        return Response(
+            {"message": "Nếu email đã đăng ký, mã xác minh sẽ được gửi đến hộp thư."},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
-        if step == '1':
-            # Bước 1: Gửi OTP
-            serializer = VerifyEmailSerializer(data=request.data)
-            if serializer.is_valid():
-                email = serializer.validated_data["email"]
-                user = User.objects.filter(email=email).first()
 
-                if not user:
-                    return Response(
-                        {"message": "Người dùng không tồn tại."},
-                        status=status.HTTP_404_NOT_FOUND,
-                    )
+class PasswordResetVerifyView(APIView):
+    """Exchange a valid OTP for a short-lived, reset-only token."""
 
-                # Gửi OTP qua email
-                send_html_email(email)
-                return Response(
-                    {"message": "OTP đã được gửi đến email của bạn."},
-                    status=status.HTTP_200_OK,
-                )
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    permission_classes = []
+    throttle_classes = [PasswordResetIPThrottle, PasswordResetVerifyEmailThrottle]
 
-        elif step == '2':
-            # Bước 2: Xác thực OTP
-            serializer = VerifyOTPSerializer(data=request.data)
-            if serializer.is_valid():
-                return Response({"message": "Xác thực OTP thành công."}, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @swagger_auto_schema(request_body=PasswordResetVerifySerializer)
+    def post(self, request):
+        serializer = PasswordResetVerifySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        reset_token = PasswordResetService.verify_otp(
+            email=serializer.validated_data["email"],
+            otp=serializer.validated_data["otp"],
+        )
+        return Response(
+            {"reset_token": reset_token, "expires_in": 600},
+            status=status.HTTP_200_OK,
+        )
 
-        elif step == '3':
-            # Bước 3: Đặt lại mật khẩu
-            serializer = ResetPasswordSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"message": "Cập nhật mật khẩu thành công."}, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        else:
-            # Tham số `step` không hợp lệ
-            return Response(
-                {"message": "Invalid step."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class PasswordResetCompleteView(APIView):
+    """Change a password using a valid reset-only token; authentication is not needed."""
 
-# class ResetPasswordView(APIView):
-#     def post(self, request):
-#         serializer = ResetPasswordSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response({"message": "Cập nhật mật khẩu thành công."}, status=status.HTTP_200_OK)
+    permission_classes = []
+    throttle_classes = [PasswordResetIPThrottle]
 
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# class PasswordRessetView(APIView):
-#     def post(self, request):
-#         step = request.query_params.get('step')
-
-#         if step == '1':
-#             return ForgotPasswordRequestView.as_view()(request)
-#         elif step == '2':
-#             return VerifyOTPView.as_view()(request)
-#         elif step == '3':
-#             return ResetPasswordView.as_view()(request)
-#         else:
-#             return Response(
-#                 {"message": "Invalid step."},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
+    @swagger_auto_schema(request_body=PasswordResetCompleteSerializer)
+    def post(self, request):
+        serializer = PasswordResetCompleteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        PasswordResetService.complete_reset(
+            reset_token=serializer.validated_data["reset_token"],
+            new_password=serializer.validated_data["new_password"],
+        )
+        return Response(
+            {"message": "Mật khẩu đã được cập nhật. Vui lòng đăng nhập lại."},
+            status=status.HTTP_200_OK,
+        )

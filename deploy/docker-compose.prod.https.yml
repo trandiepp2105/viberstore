@@ -1,0 +1,16 @@
+services:
+  nginx:
+    ports:
+      - "443:443"
+    volumes:
+      - ../nginx/prod-https.conf.template:/etc/nginx/templates/default.conf.template:ro
+    environment:
+      APP_PUBLIC_IP: ${APP_PUBLIC_IP:?Set APP_PUBLIC_IP in the root .env file}
+
+  backend:
+    environment:
+      APP_HOST: ${APP_PUBLIC_IP:?Set APP_PUBLIC_IP in the root .env file}
+      APP_SCHEME: https
+      FRONTEND_ORIGIN: https://${APP_PUBLIC_IP:?Set APP_PUBLIC_IP in the root .env file}
+      ADMIN_ORIGIN: https://${APP_PUBLIC_IP:?Set APP_PUBLIC_IP in the root .env file}
+      DJANGO_SECURE_SSL_REDIRECT: "True"

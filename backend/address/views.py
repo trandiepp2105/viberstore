@@ -12,6 +12,7 @@ from address.services import LocationService
 class ProvinceListView(APIView):
     """View to list all provinces."""
     def get(self, request):
+        """Xử lý HTTP `GET` của API view `ProvinceListView` trong domain `address`, nhận request và trả response phù hợp."""
         provinces = LocationService.get_provinces()
         data = [{"id": p.id, "name": p.name, "code": p.code} for p in provinces]
         return Response(data)
@@ -19,6 +20,7 @@ class ProvinceListView(APIView):
 class DistrictListView(APIView):
     """View to list districts by province."""
     def get(self, request, province_id):
+        """Xử lý HTTP `GET` của API view `DistrictListView` trong domain `address`, nhận request, province_id và trả response phù hợp."""
         districts = LocationService.get_districts_by_province(province_id)
         data = [{"id": d.id, "name": d.name, "code": d.code} for d in districts]
         return Response(data)
@@ -26,11 +28,13 @@ class DistrictListView(APIView):
 class WardListView(APIView):
     """View to list wards by district."""
     def get(self, request, district_id):
+        """Xử lý HTTP `GET` của API view `WardListView` trong domain `address`, nhận request, district_id và trả response phù hợp."""
         wards = LocationService.get_wards_by_district(district_id)
         data = [{"id": w.id, "name": w.name, "code": w.code} for w in wards]
         return Response(data)
 
 class DeliveryAddressView(APIView):
+    """API view `DeliveryAddressView` của domain `address`, chịu trách nhiệm liệt kê hoặc tạo địa chỉ của user.. HTTP methods: get(), post()."""
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -64,6 +68,7 @@ class DeliveryAddressView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DeliveryAddressDetailView(APIView):
+    """API view `DeliveryAddressDetailView` của domain `address`, chịu trách nhiệm cập nhật hoặc xóa địa chỉ của user.. HTTP methods: put(), delete()."""
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
@@ -104,6 +109,7 @@ class DeliveryAddressDetailView(APIView):
         return Response({"detail": "Address not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class SetDefaultAddressView(APIView):
+    """API view `SetDefaultAddressView` của domain `address`, chịu trách nhiệm đặt địa chỉ của user làm mặc định.. HTTP methods: post()."""
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(

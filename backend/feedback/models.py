@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _ # For choices
 from .enums import ReviewStatus # Assuming enums.py is in the same app
 
 class Review(models.Model):
+    """Model `Review` của domain `feedback`, biểu diễn đánh giá sản phẩm của user gồm rating/comment và trạng thái kiểm duyệt.. Thành phần chính: product, order, user, rating, comment, status, created_at, updated_at, clean()."""
     product = models.ForeignKey(
         'product.Product', # Use string reference to avoid circular imports
         on_delete=models.CASCADE,
@@ -41,6 +42,7 @@ class Review(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Updated At"))
 
     class Meta:
+        """Khai báo metadata cho `Review`, gồm: verbose_name, verbose_name_plural, ordering, db_table, constraints, indexes."""
         verbose_name = _("Review")
         verbose_name_plural = _("Reviews")
         ordering = ['-created_at']
@@ -58,10 +60,12 @@ class Review(models.Model):
         ]
 
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         rating_str = f"{self.rating} Star{'s' if self.rating > 1 else ''}" if self.rating else 'Comment'
         return f"{rating_str} by {self.user.email} for {self.product.name}"
 
     def clean(self):
+        """Kiểm tra các invariant của model trước khi lưu."""
         # Ensure either rating or comment is provided
         if self.rating is None and not self.comment:
             raise models.ValidationError(_("A review must have at least a rating or a comment."))

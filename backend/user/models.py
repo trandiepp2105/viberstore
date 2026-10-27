@@ -8,7 +8,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 
 
 class CustomUserManager(BaseUserManager):
+    """Model `CustomUserManager` của domain `user`, biểu diễn dữ liệu persistent của domain này. Thành phần chính: create_user(), create_superuser()."""
     def create_user(self, email, password=None, **extra_fields):
+        """Xử lý thao tác `create_user` của model trong domain `user`."""
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
@@ -18,6 +20,7 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """Xử lý thao tác `create_superuser` của model trong domain `user`."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -29,6 +32,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
+    """Model `User` của domain `user`, biểu diễn tài khoản đăng nhập bằng email, liên kết với role và các nghiệp vụ mua hàng.. Thành phần chính: first_name, last_name, username, name, email, password, phone_number, is_active, is_verify, last_login, created_at, updated_at, USERNAME_FIELD, REQUIRED_FIELDS, objects, roles, add_role(), remove_role(), has_role(), get_roles()."""
     first_name = None  
     last_name = None  
     username = None   
@@ -52,9 +56,11 @@ class User(AbstractUser):
         verbose_name="Roles"
     )
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.email
 
     class Meta:
+        """Khai báo metadata cho `User`, gồm: verbose_name, verbose_name_plural, db_table."""
         verbose_name = "User"
         verbose_name_plural = "Users"
         db_table = 'user'
@@ -78,8 +84,32 @@ class User(AbstractUser):
         """Lấy danh sách role của user"""
         return self.roles.values_list('role__name', flat=True)
 
+
+class PasswordResetChallenge(models.Model):
+    """Store the one-time OTP and reset-token state for one user's password reset."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="password_reset_challenge",
+    )
+    otp_hash = models.CharField(max_length=64, blank=True)
+    otp_expires_at = models.DateTimeField(null=True, blank=True)
+    otp_attempts = models.PositiveSmallIntegerField(default=0)
+    reset_token_hash = models.CharField(max_length=64, blank=True, db_index=True)
+    reset_token_expires_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "user_password_reset_challenge"
+
+    def __str__(self):
+        return f"Password reset challenge for user {self.user_id}"
+
 # Role model
 class Role(models.Model):
+    """Model `Role` của domain `user`, biểu diễn vai trò dùng để phân quyền user.. Thành phần chính: name, description, created_at, updated_at."""
     name = models.CharField(
         max_length=50,
         unique=True,
@@ -91,9 +121,11 @@ class Role(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return self.name
 
     class Meta:
+        """Khai báo metadata cho `Role`, gồm: verbose_name, verbose_name_plural, db_table."""
         verbose_name = "Role"
         verbose_name_plural = "Roles"
         db_table = 'role'
@@ -101,16 +133,18 @@ class Role(models.Model):
 
 # Many-to-Many Relationship between User and Role
 class UserRole(models.Model):
+    """Model `UserRole` của domain `user`, biểu diễn quan hệ gán role cho user và thời điểm gán.. Thành phần chính: user, role, assigned_at."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_roles", verbose_name="User")
     role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name="user_roles", verbose_name="Role")
     assigned_at = models.DateTimeField(auto_now_add=True, verbose_name="Assigned At")
 
     class Meta:
+        """Khai báo metadata cho `UserRole`, gồm: verbose_name, verbose_name_plural, unique_together, db_table."""
         verbose_name = "User Role"
         verbose_name_plural = "User Roles"
         unique_together = ('user', 'role')
         db_table = 'user_role'
 
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return f"{self.user.email} - {self.role.name}"
-

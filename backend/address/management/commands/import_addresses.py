@@ -3,9 +3,11 @@ from django.core.management.base import BaseCommand
 from address.models import Province, District, Ward
 
 class Command(BaseCommand):
+    """Import cây tỉnh, huyện và xã từ nguồn dữ liệu địa chỉ vào database."""
     help = "Import Vietnam addresses from provinces.open-api.vn"
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         self.stdout.write("Starting to import Vietnam addresses...")
 
         # Base URL of the API

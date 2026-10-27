@@ -2,9 +2,11 @@ from django.core.management.base import BaseCommand
 from product.models import Product, ProductImage
 
 class Command(BaseCommand):
+    """Cập nhật hình ảnh chính của product dựa trên dữ liệu variant hoặc file đã import."""
     help = 'Cập nhật main_image_url cho tất cả các sản phẩm từ ProductImage có is_main=True'
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         # Lấy tất cả các sản phẩm
         products = Product.objects.all()
         updated_count = 0

@@ -1,0 +1,124 @@
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: viberstore_prod_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ../nginx/prod-http.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./certbot-webroot:/var/www/certbot:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - ../backend/media:/var/www/media:ro
+      - ../backend/static:/var/www/static:ro
+    environment:
+      NGINX_ENVSUBST_FILTER: "^APP_PUBLIC_IP$"
+    depends_on:
+      - frontend
+      - admin
+      - backend
+    restart: unless-stopped
+    networks: [prodnet]
+
+  certbot:
+    image: certbot/certbot:v5.5.0
+    profiles: [certificates]
+    entrypoint: ["certbot"]
+    command:
+      - certonly
+      - --webroot
+      - --webroot-path
+      - /var/www/certbot
+      - --preferred-profile
+      - shortlived
+      - --ip-address
+      - ${APP_PUBLIC_IP:?Set APP_PUBLIC_IP in the root .env file}
+      - --email
+      - ${CERTBOT_EMAIL:?Set CERTBOT_EMAIL in the root .env file}
+      - --agree-tos
+      - --non-interactive
+    volumes:
+      - ./certbot-webroot:/var/www/certbot
+      - letsencrypt:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - certbot-log:/var/log/letsencrypt
+    networks: [prodnet]
+
+  frontend:
+    container_name: viberstore_prod_frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    expose: ["80"]
+    restart: unless-stopped
+    networks:
+      prodnet:
+        aliases: [viberstore_frontend]
+
+  admin:
+    container_name: viberstore_prod_admin
+    build:
+      context: ../admin
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_URL: /dashboard
+    expose: ["80"]
+    restart: unless-stopped
+    networks:
+      prodnet:
+        aliases: [viberstore_admin]
+
+  backend:
+    container_name: viberstore_prod_backend
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    expose: ["8000"]
+    env_file: ../.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      prodnet:
+        aliases: [viberstore_backend]
+
+  mysql:
+    image: mysql:8.0
+    container_name: viberstore_prod_mysql
+    ports:
+      - "3309:3309"
+    env_file: ../.env
+    command: ["--port=3309"]
+    volumes:
+      - prod-mysql:/var/lib/mysql
+      - ../initial_data:/docker-entrypoint-initdb.d:ro
+      - ../mysql_custom_conf:/etc/mysql/conf.d:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /var/lib/mysql/initial_data_imported.flag"]
+      interval: 5s
+      timeout: 2s
+      retries: 72
+      start_period: 15s
+    networks: [prodnet]
+
+  redis:
+    image: redis:latest
+    container_name: viberstore_prod_redis
+    expose: ["6379"]
+    command: ["redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxmemory-policy", "noeviction"]
+    volumes:
+      - prod-redis:/data
+    restart: unless-stopped
+    networks: [prodnet]
+
+volumes:
+  prod-mysql:
+  prod-redis:
+  letsencrypt:
+  certbot-var:
+  certbot-log:
+
+networks:
+  prodnet:
+    driver: bridge

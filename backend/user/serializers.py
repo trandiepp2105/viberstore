@@ -13,16 +13,20 @@ from django.core.cache import cache
 from user.email_conf import hash_email
 
 class UserSimpleSerializer(serializers.ModelSerializer):
+     """Serializer `UserSimpleSerializer` của domain `user`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: cấu hình field/Meta."""
      class Meta:
+         """Khai báo metadata cho `UserSimpleSerializer`, gồm: model, fields."""
          model = User
          fields = ['id', 'username', 'first_name', 'last_name'] # Or email
 
 
 class VerifyEmailSerializer(serializers.Serializer):
+    """Serializer `VerifyEmailSerializer` của domain `user`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: email, otp, validate()."""
     email = serializers.EmailField(required=True)
     otp = serializers.CharField(max_length=6, required=True)
 
     def validate(self, data):
+        """Xử lý `validate` của serializer `VerifyEmailSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         email = data.get('email')
         otp = data.get('otp')
 
@@ -34,15 +38,18 @@ class VerifyEmailSerializer(serializers.Serializer):
         return data
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Serializer `CustomTokenObtainPairSerializer` của domain `user`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: get_token(), validate()."""
 
     @classmethod
     def get_token(cls, user):
+        """Xử lý `get_token` của serializer `CustomTokenObtainPairSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         token = super().get_token(user)
         token['email'] = user.email
 
         return token
         
     def validate(self, attrs):
+        """Xử lý `validate` của serializer `CustomTokenObtainPairSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         email = attrs.get("email")
         password = attrs.get("password")
 
@@ -66,7 +73,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return super().validate(attrs)
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializer `UserSerializer` của domain `user`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: create()."""
     class Meta:
+        """Khai báo metadata cho `UserSerializer`, gồm: model, fields, extra_kwargs."""
         model = User
         fields = ['id', 'name', 'email', 'phone_number','password']
         extra_kwargs = {
@@ -74,6 +83,7 @@ class UserSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        """Xử lý `create` của serializer `UserSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         # Tạo mới user với dữ liệu đã được xác thực
         instance = self.Meta.model(**validated_data)
         password = validated_data.get('password')
@@ -84,18 +94,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class VerifyEmailSerializer(serializers.Serializer):
+    """Serializer `VerifyEmailSerializer` của domain `user`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: email, validate_email()."""
     email = serializers.EmailField()
 
     def validate_email(self, value):
+        """Xử lý `validate_email` của serializer `VerifyEmailSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         if not User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email không tồn tại.")
         return value
 
 class VerifyOTPSerializer(serializers.Serializer):
+    """Serializer `VerifyOTPSerializer` của domain `user`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: email, otp, validate()."""
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6)
 
     def validate(self, data):
+        """Xử lý `validate` của serializer `VerifyOTPSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         email = data.get("email")
         otp = data.get("otp")
 
@@ -111,24 +125,21 @@ class VerifyOTPSerializer(serializers.Serializer):
 
         return data
 
-class ResetPasswordSerializer(serializers.Serializer):
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """Validate the email submitted to request a password reset OTP."""
+
     email = serializers.EmailField()
-    new_password = serializers.CharField(write_only=True)
 
-    def validate_email(self, value):
-        if not User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email không tồn tại.")
-        return value
 
-    def save(self):
-        email = self.validated_data['email']
-        new_password = self.validated_data['new_password']
+class PasswordResetVerifySerializer(serializers.Serializer):
+    """Validate the email and OTP used to exchange an OTP for a reset token."""
 
-        # Cập nhật mật khẩu
-        user = User.objects.get(email=email)
-        user.set_password(new_password)
-        user.save()
+    email = serializers.EmailField()
+    otp = serializers.RegexField(regex=r"^\d{6}$", max_length=6, min_length=6)
 
-        # Xóa OTP khỏi cache
-        cache.delete(f"otp_{email}")
-        return user
+
+class PasswordResetCompleteSerializer(serializers.Serializer):
+    """Validate a reset-only token and proposed replacement password."""
+
+    reset_token = serializers.CharField(write_only=True, trim_whitespace=False)
+    new_password = serializers.CharField(write_only=True, trim_whitespace=False)

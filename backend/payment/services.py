@@ -5,6 +5,7 @@ from payment.vnpay import vnpay
 from datetime import datetime
 
 def get_client_ip(request):
+    """Thực hiện use case `get_client_ip` của `payment` trong domain `payment`, nhận request và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
         ip = x_forwarded_for.split(',')[0]
@@ -13,16 +14,20 @@ def get_client_ip(request):
     return ip
 
 class PaymentService:
+    """Service `PaymentService` của domain `payment`, chịu trách nhiệm tạo payment, xử lý trạng thái và tích hợp VNPay.. Các method: list_payment_statuses(), list_payment_methods(), get_payment_method_by_id(), list_payments(), paid_payment(), vnpay_payment(), process_vnpay_response(), create_payment()."""
     @staticmethod
     def list_payment_statuses():
+        """Thực hiện use case `list_payment_statuses` của `PaymentService` trong domain `payment`, nhận dữ liệu theo ngữ cảnh và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         return PaymentStatus.objects.all()
 
     @staticmethod
     def list_payment_methods():
+        """Thực hiện use case `list_payment_methods` của `PaymentService` trong domain `payment`, nhận dữ liệu theo ngữ cảnh và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         return PaymentMethod.objects.filter(is_active=True)
 
     @staticmethod
     def get_payment_method_by_id(payment_method_id):
+        """Thực hiện use case `get_payment_method_by_id` của `PaymentService` trong domain `payment`, nhận payment_method_id và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try:
             return PaymentMethod.objects.get(id=payment_method_id, is_active=True)
         except ObjectDoesNotExist:
@@ -30,10 +35,12 @@ class PaymentService:
 
     @staticmethod
     def list_payments(order_id):
+        """Thực hiện use case `list_payments` của `PaymentService` trong domain `payment`, nhận order_id và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         return Payment.objects.filter(order_id=order_id)
 
     @staticmethod
     def paid_payment(payment_id):
+        """Thực hiện use case `paid_payment` của `PaymentService` trong domain `payment`, nhận payment_id và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try:
             payment = Payment.objects.get(id=payment_id)
             payment.status = PaymentStatus.objects.get(code='COMPLETED')
@@ -44,6 +51,7 @@ class PaymentService:
 
     @staticmethod
     def vnpay_payment(request, order, payment_method, transaction_id, gateway_response, amount):
+        """Thực hiện use case `vnpay_payment` của `PaymentService` trong domain `payment`, nhận request, order, payment_method, transaction_id, gateway_response, amount và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         ipaddr = get_client_ip(request)
         # Build URL Payment
         vnp = vnpay()
@@ -86,6 +94,7 @@ class PaymentService:
 
     @staticmethod
     def process_vnpay_response(request):
+        """Thực hiện use case `process_vnpay_response` của `PaymentService` trong domain `payment`, nhận request và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         from django.utils.timezone import now
 
         data = request.data
@@ -132,6 +141,7 @@ class PaymentService:
 
     @staticmethod
     def create_payment(order, status, method, transaction_id, gateway_response, amount, paid_at):
+        """Thực hiện use case `create_payment` của `PaymentService` trong domain `payment`, nhận order, status, method, transaction_id, gateway_response, amount, paid_at và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         try:
             payment_status = PaymentStatus.objects.get(code=status)
             payment_method = PaymentMethod.objects.get(code=method, is_active=True)

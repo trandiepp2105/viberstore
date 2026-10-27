@@ -36,6 +36,7 @@ class CartView(APIView):
         tags=['Cart']
     )
     def get(self, request, format=None):
+        """Xử lý HTTP `GET` của API view `CartView` trong domain `cart`, nhận request, format và trả response phù hợp."""
         try:
             cart_items = CartService.list_cart_items(request.user)
             serializer = CartItemSerializer(cart_items, many=True, context={'request': request})
@@ -68,6 +69,7 @@ class CartView(APIView):
         tags=['Cart']
     )
     def post(self, request, format=None):
+        """Xử lý HTTP `POST` của API view `CartView` trong domain `cart`, nhận request, format và trả response phù hợp."""
         # Validate basic input format using serializer
         serializer = CartItemSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -116,6 +118,7 @@ class CartView(APIView):
         tags=['Cart']
     )
     def delete(self, request, format=None):
+        """Xử lý HTTP `DELETE` của API view `CartView` trong domain `cart`, nhận request, format và trả response phù hợp."""
         try:
             deleted_count = CartService.clear_cart(request.user)
             logger.info(f"User {request.user.pk} cleared cart, removed {deleted_count} items.")
@@ -162,6 +165,7 @@ class CartItemDetailView(APIView):
         tags=['Cart']
     )
     def put(self, request, pk, format=None):
+        """Xử lý HTTP `PUT` của API view `CartItemDetailView` trong domain `cart`, nhận request, pk, format và trả response phù hợp."""
         try:
             cart_item_to_update = self._get_object(pk, request.user)
 
@@ -219,6 +223,7 @@ class CartItemDetailView(APIView):
         tags=['Cart']
     )
     def patch(self, request, pk, format=None):
+        """Xử lý HTTP `PATCH` của API view `CartItemDetailView` trong domain `cart`, nhận request, pk, format và trả response phù hợp."""
         new_variant_id = request.data.get('new_variant_id')
         if not new_variant_id:
             return Response({"error": "New variant ID is required."}, status=status.HTTP_400_BAD_REQUEST)
@@ -248,6 +253,7 @@ class CartItemDetailView(APIView):
         tags=['Cart']
     )
     def delete(self, request, pk, format=None):
+        """Xử lý HTTP `DELETE` của API view `CartItemDetailView` trong domain `cart`, nhận request, pk, format và trả response phù hợp."""
         try:
             # _get_object(pk, request.user) # Optional check before delete
             success = CartService.remove_item(user=request.user, cart_item_id=pk)
@@ -268,6 +274,7 @@ class BulkDeleteCartItemsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def delete(self, request, format=None):
+        """Xử lý HTTP `DELETE` của API view `BulkDeleteCartItemsView` trong domain `cart`, nhận request, format và trả response phù hợp."""
         cart_item_ids = request.data.get('cart_item_ids', [])
         if not isinstance(cart_item_ids, list) or not cart_item_ids:
             return Response(

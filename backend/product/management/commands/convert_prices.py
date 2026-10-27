@@ -3,9 +3,11 @@ from product.models import Product, ProductVariant
 from decimal import Decimal, InvalidOperation
 
 class Command(BaseCommand):
+    """Chuyển đổi giá sản phẩm theo quy tắc dữ liệu được định nghĩa trong command."""
     help = "Convert price fields from string to Decimal format"
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         # Convert Product prices
         products = Product.objects.all()
         for product in products:

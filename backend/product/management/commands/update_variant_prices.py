@@ -2,9 +2,11 @@ from django.core.management.base import BaseCommand
 from product.models import ProductVariant
 
 class Command(BaseCommand):
+    """Cập nhật giá của các product variant theo dữ liệu sản phẩm trong database."""
     help = "Kiểm tra và cập nhật giá của tất cả các ProductVariant."
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         updated_count = 0
 
         # Lấy tất cả các ProductVariant

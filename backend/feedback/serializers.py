@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 # --- Simple Serializers for nested display (if not already defined elsewhere) ---
 
 class ProductSimpleSerializer(serializers.ModelSerializer):
+    """Serializer `ProductSimpleSerializer` của domain `feedback`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: cấu hình field/Meta."""
     class Meta:
+        """Khai báo metadata cho `ProductSimpleSerializer`, gồm: model, fields."""
         model = Product
         fields = ['id', 'name', 'slug']
 
@@ -55,6 +57,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     comment = serializers.CharField(required=False, allow_blank=True, allow_null=True, style={'base_template': 'textarea.html'})
 
     class Meta:
+        """Khai báo metadata cho `ReviewSerializer`, gồm: model, fields, read_only_fields."""
         model = Review
         fields = [
             'id',
@@ -98,6 +101,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 # --- Serializer for Admin updating status ---
 class ReviewStatusUpdateSerializer(serializers.Serializer):
+    """Serializer `ReviewStatusUpdateSerializer` của domain `feedback`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: status."""
     status = serializers.ChoiceField(    choices=[status.value for status in ReviewStatus], required=True)
     # Optional note from admin?
     # admin_note = serializers.CharField(required=False, allow_blank=True)

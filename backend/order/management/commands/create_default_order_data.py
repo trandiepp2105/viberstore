@@ -2,9 +2,11 @@ from django.core.management.base import BaseCommand
 from order.models import OrderStatus, ShippingMethod, OrderReutrnStatus, DeliveryMethod
 
 class Command(BaseCommand):
+    """Tạo các bản ghi mặc định cần cho trạng thái và dữ liệu lookup của order."""
     help = "Create default order statuses, shipping methods, and return statuses"
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         # Create default order statuses
         statuses = [
             {"status_code": "PENDING", "status_name": "Pending", "description": "Order is pending."},

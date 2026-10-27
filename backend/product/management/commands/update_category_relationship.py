@@ -2,9 +2,11 @@ from django.core.management.base import BaseCommand
 from product.models import ProductCategory, Category
 
 class Command(BaseCommand):
+    """Đồng bộ quan hệ giữa product và category theo dữ liệu catalog hiện có."""
     help = 'Add parent categories to ProductCategory for each product in subcategories'
 
     def handle(self, *args, **kwargs):
+        """Thực thi lệnh quản trị với các tham số đầu vào được cung cấp."""
         # Lấy tất cả các bản ghi trong ProductCategory
         product_categories = ProductCategory.objects.select_related('category', 'product')
 

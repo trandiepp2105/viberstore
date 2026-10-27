@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 # --- Promotion Serializer ---
 class PromotionSerializer(serializers.ModelSerializer):
+    """Serializer `PromotionSerializer` của domain `marketing`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: type_display, applied_product_ids, applied_category_ids, get_applied_product_ids(), get_applied_category_ids(), validate()."""
     type_display = serializers.CharField(source='get_type_display', read_only=True)
     # Consider DecimalField if model changes
     # value = serializers.DecimalField(max_digits=10, decimal_places=2)
@@ -31,6 +32,7 @@ class PromotionSerializer(serializers.ModelSerializer):
     applied_category_ids = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
+        """Khai báo metadata cho `PromotionSerializer`, gồm: model, fields, read_only_fields."""
         model = Promotion
         fields = [
             'id', 'name', 'description', 'type', 'type_display', 'value',
@@ -45,9 +47,11 @@ class PromotionSerializer(serializers.ModelSerializer):
         )
 
     def get_applied_product_ids(self, obj: Promotion) -> List[int]:
+        """Xử lý `get_applied_product_ids` của serializer `PromotionSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         return list(ProductPromotion.objects.filter(promotion=obj).values_list('product_id', flat=True))
 
     def get_applied_category_ids(self, obj: Promotion) -> List[int]:
+        """Xử lý `get_applied_category_ids` của serializer `PromotionSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         return list(CategoryPromotion.objects.filter(promotion=obj).values_list('category_id', flat=True))
 
     def validate(self, data):
@@ -70,6 +74,7 @@ class PromotionSerializer(serializers.ModelSerializer):
 
 # --- Coupon Serializer ---
 class CouponSerializer(serializers.ModelSerializer):
+    """Serializer `CouponSerializer` của domain `marketing`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: type, validate_code(), validate()."""
     type = serializers.ChoiceField(choices=PromotionType.choices())  # Use PromotionType.choices()
 
     # value = serializers.DecimalField(...) # If using DecimalField
@@ -77,6 +82,7 @@ class CouponSerializer(serializers.ModelSerializer):
     # max_discount_amount = serializers.DecimalField(...)
 
     class Meta:
+        """Khai báo metadata cho `CouponSerializer`, gồm: model, fields, read_only_fields, extra_kwargs."""
         model = Coupon
         fields = [
             'id', 'code', 'description', 'type', 'value',
@@ -132,11 +138,13 @@ class PromotionAssignmentSerializer(serializers.Serializer):
     )
 
     def validate_promotion_id(self, value):
+        """Xử lý `validate_promotion_id` của serializer `PromotionAssignmentSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         if not Promotion.objects.filter(pk=value).exists():
             raise serializers.ValidationError(f"Promotion with ID {value} not found.")
         return value
 
     def validate_product_ids(self, value):
+        """Xử lý `validate_product_ids` của serializer `PromotionAssignmentSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         if not value: return []
         count = Product.objects.filter(pk__in=value).count()
         if count != len(set(value)): # Check if all provided IDs exist
@@ -144,6 +152,7 @@ class PromotionAssignmentSerializer(serializers.Serializer):
         return list(set(value)) # Return unique IDs
 
     def validate_category_ids(self, value):
+        """Xử lý `validate_category_ids` của serializer `PromotionAssignmentSerializer` để validate, tạo hoặc biểu diễn dữ liệu API."""
         if not value: return []
         count = Category.objects.filter(pk__in=value).count()
         if count != len(set(value)):
@@ -153,11 +162,13 @@ class PromotionAssignmentSerializer(serializers.Serializer):
 
 # --- Serializer for Coupon Validation (Input/Output) ---
 class CouponValidationRequestSerializer(serializers.Serializer):
+    """Serializer `CouponValidationRequestSerializer` của domain `marketing`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: code."""
     code = serializers.CharField(required=True, max_length=255)
     # Optional: pass order amount to check min_order_amount condition
     # order_amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False)
 
 class CouponValidationResponseSerializer(serializers.Serializer):
+    """Serializer `CouponValidationResponseSerializer` của domain `marketing`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: is_valid, message, discount_amount, coupon_id, final_amount."""
     is_valid = serializers.BooleanField()
     message = serializers.CharField()
     discount_amount = serializers.IntegerField(required=False, allow_null=True) # Or DecimalField
@@ -167,12 +178,14 @@ class CouponValidationResponseSerializer(serializers.Serializer):
 
 # --- Coupon Usage Serializer (Read-Only) ---
 class CouponUsageSerializer(serializers.ModelSerializer):
+    """Serializer `CouponUsageSerializer` của domain `marketing`, chịu trách nhiệm validate và chuyển đổi payload API. Thành phần chính: user_email, coupon_code, order_code."""
     # Show related object details if needed
     user_email = serializers.EmailField(source='user.email', read_only=True) # Example
     coupon_code = serializers.CharField(source='coupon.code', read_only=True)
     order_code = serializers.CharField(source='order.order_code', read_only=True, allow_null=True)
 
     class Meta:
+        """Khai báo metadata cho `CouponUsageSerializer`, gồm: model, fields, read_only_fields."""
         model = CouponUsage
         fields = [
             'id', 'user', 'user_email', 'coupon', 'coupon_code', 'order',

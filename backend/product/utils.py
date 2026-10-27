@@ -4,6 +4,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import sys
 
 def convert_image_to_jpeg(image_file):
+    """Chuyển file ảnh đầu vào sang JPEG trước khi lưu."""
     try:
         image_file.seek(0)  # 👈 reset trước khi đọc
         img = Image.open(image_file)

@@ -6,6 +6,7 @@ from django.core.cache import cache
 
 # Hàm để hash email
 def hash_email(email: str) -> str:
+    """Băm email thành key ổn định để lưu và truy xuất OTP trong cache."""
     return hashlib.sha256(email.encode()).hexdigest()
 
 def generate_otp(email: str, expiration_time: int = 300) -> str:
@@ -66,13 +67,28 @@ def generate_otp_email_body(otp: str, description: str = "Thank you for choosing
     """
 
 def send_html_email(email: str, expiration_time: int = 300, subject: str = '[IMPORTANT] Please enter this OTP to authenticate your account!', description: str = ""):
+    """Tạo OTP, dựng nội dung HTML và gửi email xác thực."""
     otp = generate_otp(email, expiration_time)
-    html_message = generate_otp_email_body(otp)
-    subject = f'[IMPORTANT] Please enter this OTP to authenticate your account!'
+    send_html_email_with_otp(email, otp, subject=subject, description=description)
 
-    message = 'This is a plain text message.'
-    # from_email = settings.DEFAULT_FROM_EMAIL
-    from_email = 'viperphone'
-    recipient_list = [email]
 
-    send_mail(subject, message, from_email, recipient_list, html_message=html_message)
+def send_html_email_with_otp(
+    email: str,
+    otp: str,
+    *,
+    subject: str = "Password reset verification code",
+    description: str = "Use this code to reset your password. It is valid for 5 minutes.",
+) -> None:
+    """Send an already-generated OTP without placing it in the shared signup cache."""
+    message = "Use the verification code in the HTML email to continue resetting your password."
+    from_email = settings.DEFAULT_FROM_EMAIL or "webmaster@localhost"
+    send_mail(
+        subject,
+        message,
+        from_email,
+        [email],
+        html_message=generate_otp_email_body(
+            otp,
+            description=description,
+        ),
+    )

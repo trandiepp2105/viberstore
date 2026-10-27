@@ -2,12 +2,14 @@ from django.db import models
 from product.models import Product, ProductVariant
 
 class CartItem(models.Model):
+    """Model `CartItem` của domain `cart`, biểu diễn item trong giỏ hàng của user và số lượng biến thể được chọn.. Thành phần chính: user, variant, quantity, created_at, updated_at, change_quantity()."""
     user = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='cart_items')
     variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank=True)  # Thêm trường variant
     quantity = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
+        """Trả về biểu diễn chuỗi dễ đọc của đối tượng."""
         return f"CartItem(user={self.user}, variant={self.variant}, quantity={self.quantity})"    
     
     def change_quantity(self, quantity):
@@ -27,5 +29,5 @@ class CartItem(models.Model):
             self.save()
     
     class Meta:
+        """Khai báo metadata cho `CartItem`, gồm: db_table."""
         db_table = 'cart_item'
-

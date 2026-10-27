@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 # --- Promotion Services ---
 class PromotionService:
+    """Service `PromotionService` của domain `marketing`, chịu trách nhiệm quản lý promotion và phạm vi product/category được áp dụng.. Các method: create_promotion(), update_promotion(), get_promotion_by_id(), list_promotions(), delete_promotion(), assign_promotion(), remove_promotion_assignments()."""
 
     @staticmethod
     @transaction.atomic
@@ -210,9 +211,11 @@ class PromotionService:
 
 # --- Coupon Services ---
 class CouponService:
+    """Service `CouponService` của domain `marketing`, chịu trách nhiệm kiểm tra điều kiện, tính giảm giá và áp dụng coupon.. Các method: _normalize_code(), create_coupon(), update_coupon(), get_coupon_by_id(), get_coupon_by_code(), list_coupons(), delete_coupon(), get_valid_coupons_by_ids(), get_free_shipping_coupons(), calculate_discount(), validate_coupon(), record_coupon_usage()."""
 
     @staticmethod
     def _normalize_code(code: str) -> str:
+        """Thực hiện use case `_normalize_code` của `CouponService` trong domain `marketing`, nhận code và truy vấn/thay đổi dữ liệu theo quy tắc nghiệp vụ."""
         return code.strip().upper()
 
     @staticmethod
@@ -568,6 +571,7 @@ class CouponService:
 
 # --- Coupon Usage Services ---
 class CouponUsageService:
+    """Service `CouponUsageService` của domain `marketing`, chịu trách nhiệm quản lý lịch sử sử dụng coupon và giới hạn dùng.. Các method: list_coupon_usage()."""
     @staticmethod
     def list_coupon_usage(filters: Optional[Dict[str, Any]] = None) -> models.QuerySet[CouponUsage]:
         """Lists coupon usage records (for Admin)."""
